@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Processing with OpenCV.js</title>
+    <style>
+        canvas { border: 1px solid black; }
+        .container { display: flex; gap: 20px; }
+        .controls { margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div>
+            <input type="file" id="imageInput" accept="image/*">
+            <div class="controls">
+                <label>Width: <input type="number" id="rectWidth" value="100" min="1"></label>
+                <label>Height: <input type="number" id="rectHeight" value="100" min="1"></label>
+                <label>Threshold: <input type="number" id="threshold" value="127" min="0" max="255"></label>
+                <label><input type="checkbox" id="grayscale"> Grayscale</label>
+                <label><input type="checkbox" id="invert"> Invert</label>
+                <label>Crop Left: <input type="range" id="cropLeft" value="0" min="0" max="100"></label>
+                <label>Crop Top: <input type="range" id="cropTop" value="0" min="0" max="100"></label>
+                <label>Crop Right: <input type="range" id="cropRight" value="0" min="0" max="100"></label>
+                <label>Crop Bottom: <input type="range" id="cropBottom" value="0" min="0" max="100"></label>
+            </div>
+            <canvas id="canvas"></canvas>
+        </div>
+        <div>
+            <canvas id="maskCanvas"></canvas>
+            <div id="pixelCount"></div>
+        </div>
+    </div>
+
+    <script src="https://docs.opencv.org/4.9.0/opencv.js" onload="onOpenCvReady();" async></script>
+    <script>
+        let canvas, ctx, maskCanvas, maskCtx;
+        let currentImage = null;
+        let rectX = 0, rectY = 0;
+        let isMoving = false;
+
+        function onOpenCvReady() {
+            console.log("OpenCV.js is ready!");
+            canvas = document.getElementById('canvas');
+            ctx = canvas.getContext('2d');
+            maskCanvas = document.getElementById('maskCanvas');
+            maskCtx = maskCanvas.getContext('2d');
+            setupEventListeners();
+        }
+
+        function countEnclosedPixels(imageCanvas, width, height, threshold, grayscale, invert) {
+            let src = cv.imread(imageCanvas);
+            let gray = new cv.Mat();
+            cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
+
+            if (invert) {
+                cv.bitwise_not(gray, gray);
+            }
+
+            let binary = new cv.Mat();
+            cv.threshold(gray, binary, threshold, 255, cv.THRESH_BINARY_INV);
+
+            let kernel = cv.Mat.ones(3, 3, cv.CV_8U);
+            cv.morphologyEx(binary, binary, cv.MORPH_CLOSE, kernel);
+
+            let contours = new cv.MatVector();
+            let hierarchy = new cv.Mat();
+            cv.findContours(binary, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
+
+            let mask = new cv.Mat.zeros(binary.rows, binary.cols, cv.CV_8U);
+            cv.drawContours(mask, contours, -1, new cv.Scalar(255), cv.FILLED);
+
+            let enclosedPixels = cv.countNonZero(mask);
+            if (width > 0 && height > 0) {
+                enclosedPixels /= (width * height);
+            }
+
+            gray.delete(); binary.delete(); kernel.delete();
+            contours.delete(); hierarchy.delete(); src.delete();
+
+            return { pixels: enclosedPixels, mask: mask };
+        }
+
+        function processImage() {
+            if (!currentImage) return;
+
+            const width = parseInt(document.getElementById('rectWidth').value);
+            const height = parseInt(document.getElementById('rectHeight').value);
+            const threshold = parseInt(document.getElementById('threshold').value);
+            const grayscale = document.getElementById('grayscale').checked;
+            const invert = document.getElementById('invert').checked;
+            const cropLeft = parseInt(document.getElementById('cropLeft').value);
+            const cropTop = parseInt(document.getElementById('cropTop').value);
+            const cropRight = parseInt(document.getElementById('cropRight').value);
+            const cropBottom = parseInt(document.getElementById('cropBottom').value);
+
+            // Расчет области обрезки
+            const imgWidth = currentImage.width;
+            const imgHeight = currentImage.height;
+            const cropX = (imgWidth * cropLeft) / 100;
+            const cropY = (imgHeight * cropTop) / 100;
+            const cropWidth = imgWidth - cropX - (imgWidth * cropRight) / 100;
+            const cropHeight = imgHeight - cropY - (imgHeight * cropBottom) / 100;
+
+            // Обновление размеров канваса
+            canvas.width = cropWidth;
+            canvas.height = cropHeight;
+            maskCanvas.width = cropWidth;
+            maskCanvas.height = cropHeight;
+
+            // Отрисовка обрезанного изображения и прямоугольника
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(currentImage, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
+            ctx.strokeStyle = 'red';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(rectX, rectY, width, height);
+
+            // Подсчет пикселей и создание маски
+            const { pixels, mask } = countEnclosedPixels(canvas, width, height, threshold, grayscale, invert);
+            cv.imshow(maskCanvas, mask);
+            document.getElementById('pixelCount').textContent = `Enclosed pixels: ${pixels.toFixed(2)}`;
+            mask.delete();
+        }
+
+        function setupEventListeners() {
+            // Загрузка изображения
+            document.getElementById('imageInput').addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                const img = new Image();
+                img.onload = () => {
+                    currentImage = img;
+                    processImage();
+                };
+                img.src = URL.createObjectURL(file);
+            });
+
+            // Перемещение прямоугольника
+            canvas.addEventListener('mousedown', (e) => {
+                if (e.button === 0) {
+                    isMoving = true;
+                }
+            });
+            canvas.addEventListener('mousemove', (e) => {
+                if (isMoving) {
+                    rectX = e.offsetX;
+                    rectY = e.offsetY;
+                    processImage();
+                }
+            });
+            canvas.addEventListener('mouseup', () => isMoving = false);
+
+            // Обновление при изменении параметров
+            document.querySelectorAll('.controls input, .controls select').forEach(input => {
+                input.addEventListener('change', processImage);
+            });
+        }
+    </script>
+</body>
+</html>
