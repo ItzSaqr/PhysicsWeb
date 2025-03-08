@@ -9,7 +9,7 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="container" style="width: 100vw">
         <div>
             <input type="file" id="imageInput" accept="image/*" style="width: 100%;">
             <div class="controls">
@@ -26,10 +26,10 @@
                 <label>Rect Y: <input type="range" id="rectY" value="0" min="0" max="200"></label>
             </div>
             <canvas id="canvas"></canvas>
-        </div>
         <div>
             <canvas id="maskCanvas"></canvas>
             <div id="pixelCount"></div>
+        </div>
         </div>
     </div>
 
