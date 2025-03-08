@@ -1,52 +1,325 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Image Processing with OpenCV.js</title>
+    <title>Обработка изображений с OpenCV.js</title>
     <style>
-        canvas { border: 1px solid black; }
-        .container { display: flex; gap: 20px; }
-        .controls { margin: 10px 0; }
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #1e1e1e;
+            margin: 0;
+            padding: 20px;
+            color: #e0e0e0;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #2d2d2d;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+        canvas {
+            border: 1px solid #444;
+            border-radius: 10px;
+            margin-top: 10px;
+            background: #1e1e1e;
+        }
+        .controls {
+            margin: 10px 0;
+        }
+        .controls label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #e0e0e0;
+        }
+        .controls input[type="range"] {
+            width: 100%;
+        }
+        .controls input[type="checkbox"] {
+            margin-right: 10px;
+        }
+        .controls input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #444;
+            border-radius: 10px;
+            background: linear-gradient(145deg, #007bff, #005bb5);
+            color: #fff;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            text-align: center;
+            font-size: 14px;
+        }
+        .controls input[type="file"]:hover {
+            background: linear-gradient(145deg, #005bb5, #004080);
+        }
+        .controls input[type="file"]::file-selector-button {
+            display: none;
+        }
+        .controls input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 8px;
+            background: #444;
+            border-radius: 5px;
+            outline: none;
+        }
+        .controls input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #007bff;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .controls input[type="range"]::-webkit-slider-thumb:hover {
+            background: #005bb5;
+        }
+        .controls input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #007bff;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .controls input[type="range"]::-moz-range-thumb:hover {
+            background: #005bb5;
+        }
+        #pixelCount {
+            margin-top: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+            text-align: center;
+            padding: 10px;
+            background: #1e1e1e;
+            border-radius: 10px;
+            border: 1px solid #444;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        .image-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .image-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .button-group button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(145deg, #007bff, #005bb5);
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .button-group button:hover {
+            background: linear-gradient(145deg, #005bb5, #004080);
+        }
+        .button-group button:active {
+            background: linear-gradient(145deg, #004080, #003366);
+        }
+        .button-group button#clearMask {
+            background: linear-gradient(145deg, #dc3545, #a71d2a);
+        }
+        .button-group button#clearMask:hover {
+            background: linear-gradient(145deg, #a71d2a, #7a1a23);
+        }
+        .button-group button#clearMask:active {
+            background: linear-gradient(145deg, #7a1a23, #5c121b);
+        }
+        .credits {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #888;
+            text-align: center;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #2d2d2d;
+            padding: 20px;
+            border-radius: 15px;
+            max-width: 600px;
+            width: 100%;
+            color: #e0e0e0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+        .modal-content h2 {
+            margin-top: 0;
+        }
+        .modal-content button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background: linear-gradient(145deg, #007bff, #005bb5);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .modal-content button:hover {
+            background: linear-gradient(145deg, #005bb5, #004080);
+        }
+        .instruction-button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(145deg, #28a745, #218838);
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .instruction-button:hover {
+            background: linear-gradient(145deg, #218838, #1e7e34);
+        }
+        .instruction-button:active {
+            background: linear-gradient(145deg, #1e7e34, #19692c);
+        }
+        .language-button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(145deg, #6c757d, #5a6268);
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            margin-top: 10px;
+        }
+        .language-button:hover {
+            background: linear-gradient(145deg, #5a6268, #495057);
+        }
+        .language-button:active {
+            background: linear-gradient(145deg, #495057, #343a40);
+        }
     </style>
 </head>
 <body>
-    <div class="container" style="width: 100vw">
-        <div>
-            <input type="file" id="imageInput" accept="image/*" style="width: 100%;">
-            <div class="controls" >
-                <label>Width: <input type="range" id="rectWidth" value="0" min="0" max="100"></label>
+    <div class="container">
+        <div class="image-container">
+            <input type="file" id="imageInput" accept="image/*">
+            
+            <!-- Функции над первым изображением -->
+            <div class="image-section">
+                <h3 data-lang="ru">Обрезка и настройка квадрата</h3>
+                <h3 data-lang="en" style="display: none;">Cropping and Square Settings</h3>
+                <div class="controls">
+                    <label data-lang="ru">Обрезка слева: <input type="range" id="cropLeft" value="0" min="0" max="100"></label>
+                    <label data-lang="en" style="display: none;">Crop Left: <input type="range" id="cropLeft" value="0" min="0" max="100"></label>
+                </div>
+                <div class="controls">
+                    <label data-lang="ru">Обрезка сверху: <input type="range" id="cropTop" value="0" min="0" max="100"></label>
+                    <label data-lang="en" style="display: none;">Crop Top: <input type="range" id="cropTop" value="0" min="0" max="100"></label>
+                </div>
+                <div class="controls">
+                    <label data-lang="ru">Обрезка справа: <input type="range" id="cropRight" value="0" min="0" max="100"></label>
+                    <label data-lang="en" style="display: none;">Crop Right: <input type="range" id="cropRight" value="0" min="0" max="100"></label>
+                </div>
+                <div class="controls">
+                    <label data-lang="ru">Обрезка снизу: <input type="range" id="cropBottom" value="0" min="0" max="100"></label>
+                    <label data-lang="en" style="display: none;">Crop Bottom: <input type="range" id="cropBottom" value="0" min="0" max="100"></label>
+                </div>
+                <div class="controls">
+                    <label data-lang="ru">Ширина квадрата: <input type="range" id="rectWidth" value="0" min="0" max="100"></label>
+                    <label data-lang="en" style="display: none;">Square Width: <input type="range" id="rectWidth" value="0" min="0" max="100"></label>
+                </div>
+                <div class="controls">
+                    <label data-lang="ru">Высота квадрата: <input type="range" id="rectHeight" value="0" min="0" max="100"></label>
+                    <label data-lang="en" style="display: none;">Square Height: <input type="range" id="rectHeight" value="0" min="0" max="100"></label>
+                </div>
+                <div class="controls">
+                    <label data-lang="ru">Позиция X: <input type="range" id="rectX" value="0" min="0" max="200"></label>
+                    <label data-lang="en" style="display: none;">Position X: <input type="range" id="rectX" value="0" min="0" max="200"></label>
+                </div>
+                <div class="controls">
+                    <label data-lang="ru">Позиция Y: <input type="range" id="rectY" value="0" min="0" max="200"></label>
+                    <label data-lang="en" style="display: none;">Position Y: <input type="range" id="rectY" value="0" min="0" max="200"></label>
+                </div>
             </div>
-            <div class="controls">
-                <label>Height: <input type="range" id="rectHeight" value="0" min="0" max="100"></label>
-            </div>
-            <div class="controls">
-                <label>Threshold: <input type="range" id="threshold" value="127" min="0" max="255"></label>
-            </div>
-            <div class="controls">
-                <label><input type="checkbox" id="invert"> Invert</label>
-            </div>
-            <div class="controls">
-                <label>Crop Left: <input type="range" id="cropLeft" value="0" min="0" max="100"></label>
-            </div>
-            <div class="controls">
-                <label>Crop Top: <input type="range" id="cropTop" value="0" min="0" max="100"></label>
-            </div>
-            <div class="controls">
-                <label>Crop Right: <input type="range" id="cropRight" value="0" min="0" max="100"></label>
-            </div>
-            <div class="controls">
-                <label>Crop Bottom: <input type="range" id="cropBottom" value="0" min="0" max="100"></label>
-            </div>
-            <div class="controls">
-                <label>Rect X: <input type="range" id="rectX" value="0" min="0" max="200"></label>
-            </div>
-            <div class="controls">
-                <label>Rect Y: <input type="range" id="rectY" value="0" min="0" max="200"></label>
-            </div>
+
             <canvas id="canvas"></canvas>
-        <div>
+
+            <!-- Функции над вторым изображением -->
+            <div class="image-section">
+                <h3 data-lang="ru">Работа с маской</h3>
+                <h3 data-lang="en" style="display: none;">Mask Operations</h3>
+                <div class="controls">
+                    <label data-lang="ru">Порог: <input type="range" id="threshold" value="127" min="0" max="255"></label>
+                    <label data-lang="en" style="display: none;">Threshold: <input type="range" id="threshold" value="127" min="0" max="255"></label>
+                </div>
+                <div class="controls">
+                    <label data-lang="ru"><input type="checkbox" id="invert" checked> Инвертировать</label>
+                    <label data-lang="en" style="display: none;"><input type="checkbox" id="invert" checked> Invert</label>
+                </div>
+                <div class="button-group">
+                    <button id="drawMask" data-lang="ru">Рисовать</button>
+                    <button id="drawMask" data-lang="en" style="display: none;">Draw</button>
+                    <button id="clearMask" data-lang="ru">Очистить маску</button>
+                    <button id="clearMask" data-lang="en" style="display: none;">Clear Mask</button>
+                </div>
+            </div>
+
             <canvas id="maskCanvas"></canvas>
-            <div id="pixelCount"></div>
+            <div id="pixelCount" data-lang="ru">Площадь: 0.00</div>
+            <div id="pixelCount" data-lang="en" style="display: none;">Area: 0.00</div>
+            <div class="credits" data-lang="ru">Разработчики: Рябов Ярослав, Кострикин Андрей, Рябко Владислав</div>
+            <div class="credits" data-lang="en" style="display: none;">Developers: Ryabov Yaroslav, Kostrikin Andrey, Ryabko Vladislav</div>
+            <button class="instruction-button" id="instructionButton" data-lang="ru">Инструкция</button>
+            <button class="instruction-button" id="instructionButton" data-lang="en" style="display: none;">Instructions</button>
+            <button class="language-button" id="languageButton">Switch to English</button>
         </div>
+    </div>
+
+    <!-- Модальное окно для инструкции -->
+    <div id="instructionModal" class="modal">
+        <div class="modal-content">
+            <h2 data-lang="ru">Инструкция по использованию</h2>
+            <h2 data-lang="en" style="display: none;">Usage Instructions</h2>
+            <p data-lang="ru">
+                1. Загрузите изображение, нажав на кнопку "Выбрать файл".<br>
+                2. Используйте ползунки для настройки обрезки изображения и размеров квадрата.<br>
+                3. Настройте порог и инвертируйте изображение, если необходимо.<br>
+                4. Используйте кнопку "Рисовать", чтобы закрасить области, которые не должны учитываться в расчете площади.<br>
+                5. Нажмите "Очистить маску", чтобы удалить все закрашенные области.<br>
+                6. Результат площади отображается под вторым изображением.<br>
+            </p>
+            <p data-lang="en" style="display: none;">
+                1. Upload an image by clicking the "Choose File" button.<br>
+                2. Use the sliders to adjust the image cropping and square dimensions.<br>
+                3. Set the threshold and invert the image if necessary.<br>
+                4. Use the "Draw" button to paint areas that should not be included in the area calculation.<br>
+                5. Click "Clear Mask" to remove all painted areas.<br>
+                6. The area result is displayed below the second image.<br>
+            </p>
+            <button id="closeModal" data-lang="ru">Закрыть</button>
+            <button id="closeModal" data-lang="en" style="display: none;">Close</button>
         </div>
     </div>
 
@@ -55,10 +328,12 @@
         let canvas, ctx, maskCanvas, maskCtx;
         let currentImage = null;
         let rectX = 0, rectY = 0;
-        let isMoving = false;
+        let isDrawing = false;
+        let isDrawMode = false;
+        let currentLanguage = 'ru'; // Текущий язык
 
         function onOpenCvReady() {
-            console.log("OpenCV.js is ready!");
+            console.log("OpenCV.js готов!");
             canvas = document.getElementById('canvas');
             ctx = canvas.getContext('2d');
             maskCanvas = document.getElementById('maskCanvas');
@@ -135,11 +410,15 @@
             // Подсчет пикселей и создание маски
             const { pixels, mask } = countEnclosedPixels(canvas, width, height, threshold, invert);
             cv.imshow(maskCanvas, mask);
-            document.getElementById('pixelCount').textContent = `Enclosed pixels: ${pixels.toFixed(2)}`;
+            document.querySelectorAll('#pixelCount').forEach(el => {
+                if (el.getAttribute('data-lang') === currentLanguage) {
+                    el.textContent = currentLanguage === 'ru' ? `Площадь: ${pixels.toFixed(2)}` : `Area: ${pixels.toFixed(2)}`;
+                }
+            });
             mask.delete();
         }
 
-           function setupEventListeners() {
+        function setupEventListeners() {
             document.getElementById('imageInput').addEventListener('change', (e) => {
                 const file = e.target.files[0];
                 const img = new Image();
@@ -163,6 +442,78 @@
             document.querySelectorAll('.controls input').forEach(input => {
                 input.addEventListener('input', processImage);
             });
+
+            // Очистка маски
+            document.getElementById('clearMask').addEventListener('click', () => {
+                maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+                processImage();
+            });
+
+            // Включение/выключение режима рисования
+            document.getElementById('drawMask').addEventListener('click', () => {
+                isDrawMode = !isDrawMode;
+                document.querySelectorAll('#drawMask').forEach(el => {
+                    if (el.getAttribute('data-lang') === currentLanguage) {
+                        el.textContent = isDrawMode ? (currentLanguage === 'ru' ? "Закончить рисование" : "Stop Drawing") : (currentLanguage === 'ru' ? "Рисовать" : "Draw");
+                    }
+                });
+            });
+
+            // Рисование на маске
+            maskCanvas.addEventListener('mousedown', (e) => {
+                if (isDrawMode) {
+                    isDrawing = true;
+                    drawOnMask(e);
+                }
+            });
+
+            maskCanvas.addEventListener('mousemove', (e) => {
+                if (isDrawMode && isDrawing) drawOnMask(e);
+            });
+
+            maskCanvas.addEventListener('mouseup', () => {
+                isDrawing = false;
+            });
+
+            maskCanvas.addEventListener('mouseleave', () => {
+                isDrawing = false;
+            });
+
+            // Открытие модального окна с инструкцией
+            document.getElementById('instructionButton').addEventListener('click', () => {
+                document.getElementById('instructionModal').style.display = 'flex';
+            });
+
+            // Закрытие модального окна
+            document.getElementById('closeModal').addEventListener('click', () => {
+                document.getElementById('instructionModal').style.display = 'none';
+            });
+
+            // Смена языка
+            document.getElementById('languageButton').addEventListener('click', () => {
+                currentLanguage = currentLanguage === 'ru' ? 'en' : 'ru';
+                document.querySelectorAll('[data-lang]').forEach(el => {
+                    if (el.getAttribute('data-lang') === currentLanguage) {
+                        el.style.display = 'block';
+                    } else {
+                        el.style.display = 'none';
+                    }
+                });
+                document.getElementById('languageButton').textContent = currentLanguage === 'ru' ? 'Switch to English' : 'Переключить на русский';
+                processImage(); // Обновляем текст площади
+            });
+        }
+
+        function drawOnMask(e) {
+            const rect = maskCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            maskCtx.fillStyle = 'black';
+            maskCtx.beginPath();
+            maskCtx.arc(x, y, 10, 0, Math.PI * 2); // Рисуем круг радиусом 10px
+            maskCtx.fill();
+            processImage();
         }
     </script>
 </body>
