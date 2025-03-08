@@ -12,17 +12,34 @@
     <div class="container" style="width: 100vw">
         <div>
             <input type="file" id="imageInput" accept="image/*" style="width: 100%;">
-            <div class="controls">
+            <div class="controls" >
                 <label>Width: <input type="range" id="rectWidth" value="0" min="0" max="100"></label>
+            </div>
+            <div class="controls">
                 <label>Height: <input type="range" id="rectHeight" value="0" min="0" max="100"></label>
+            </div>
+            <div class="controls">
                 <label>Threshold: <input type="range" id="threshold" value="127" min="0" max="255"></label>
-                <label><input type="checkbox" id="grayscale"> Grayscale</label>
+            </div>
+            <div class="controls">
                 <label><input type="checkbox" id="invert"> Invert</label>
+            </div>
+            <div class="controls">
                 <label>Crop Left: <input type="range" id="cropLeft" value="0" min="0" max="100"></label>
+            </div>
+            <div class="controls">
                 <label>Crop Top: <input type="range" id="cropTop" value="0" min="0" max="100"></label>
+            </div>
+            <div class="controls">
                 <label>Crop Right: <input type="range" id="cropRight" value="0" min="0" max="100"></label>
+            </div>
+            <div class="controls">
                 <label>Crop Bottom: <input type="range" id="cropBottom" value="0" min="0" max="100"></label>
+            </div>
+            <div class="controls">
                 <label>Rect X: <input type="range" id="rectX" value="0" min="0" max="200"></label>
+            </div>
+            <div class="controls">
                 <label>Rect Y: <input type="range" id="rectY" value="0" min="0" max="200"></label>
             </div>
             <canvas id="canvas"></canvas>
@@ -49,7 +66,7 @@
             setupEventListeners();
         }
 
-        function countEnclosedPixels(imageCanvas, width, height, threshold, grayscale, invert) {
+        function countEnclosedPixels(imageCanvas, width, height, threshold, invert) {
             let src = cv.imread(imageCanvas);
             let gray = new cv.Mat();
             cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
@@ -88,7 +105,6 @@
             const width = parseInt(document.getElementById('rectWidth').value);
             const height = parseInt(document.getElementById('rectHeight').value);
             const threshold = parseInt(document.getElementById('threshold').value);
-            const grayscale = document.getElementById('grayscale').checked;
             const invert = document.getElementById('invert').checked;
             const cropLeft = parseInt(document.getElementById('cropLeft').value);
             const cropTop = parseInt(document.getElementById('cropTop').value);
@@ -117,7 +133,7 @@
             ctx.strokeRect(rectX, rectY, width, height);
 
             // Подсчет пикселей и создание маски
-            const { pixels, mask } = countEnclosedPixels(canvas, width, height, threshold, grayscale, invert);
+            const { pixels, mask } = countEnclosedPixels(canvas, width, height, threshold, invert);
             cv.imshow(maskCanvas, mask);
             document.getElementById('pixelCount').textContent = `Enclosed pixels: ${pixels.toFixed(2)}`;
             mask.delete();

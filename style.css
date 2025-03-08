@@ -65,7 +65,7 @@
         }
 
 
-        @media (min-width: 600px) {
+        @media (width: 100vw) {
 
             .container {
 
@@ -79,8 +79,6 @@
                 flex-direction: row;
 
                 flex-wrap: wrap;
-
-                justify-content: space-between;
 
             }
 
