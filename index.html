@@ -118,37 +118,6 @@
             flex-direction: column;
             gap: 8px;
         }
-        .button-group {
-            display: flex;
-            gap: 8px;
-            margin-top: 8px;
-        }
-        .button-group button {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 5px;
-            background: linear-gradient(145deg, #007bff, #005bb5);
-            color: #fff;
-            font-size: 14px;
-            cursor: pointer;
-            transition: background 0.3s ease;
-            flex: 1;
-        }
-        .button-group button:hover {
-            background: linear-gradient(145deg, #005bb5, #004080);
-        }
-        .button-group button:active {
-            background: linear-gradient(145deg, #004080, #003366);
-        }
-        .button-group button#clearMask {
-            background: linear-gradient(145deg, #dc3545, #a71d2a);
-        }
-        .button-group button#clearMask:hover {
-            background: linear-gradient(145deg, #a71d2a, #7a1a23);
-        }
-        .button-group button#clearMask:active {
-            background: linear-gradient(145deg, #7a1a23, #5c121b);
-        }
         .credits {
             margin-top: 10px;
             font-size: 12px;
@@ -238,10 +207,6 @@
                 padding: 6px;
                 font-size: 12px;
             }
-            .button-group button {
-                padding: 6px 12px;
-                font-size: 12px;
-            }
             #pixelCount {
                 font-size: 16px;
                 padding: 6px;
@@ -289,12 +254,12 @@
                     <label data-lang="en" style="display: none;">Crop Bottom: <input type="range" id="cropBottom" value="0" min="0" max="100"></label>
                 </div>
                 <div class="controls">
-                    <label data-lang="ru">Ширина квадрата: <input type="range" id="rectWidth" value="0" min="0" max="100"></label>
-                    <label data-lang="en" style="display: none;">Square Width: <input type="range" id="rectWidth" value="0" min="0" max="100"></label>
+                    <label data-lang="ru">Ширина квадрата: <input type="range" id="rectWidth" value="0" min="0" max="90"></label>
+                    <label data-lang="en" style="display: none;">Square Width: <input type="range" id="rectWidth" value="0" min="0" max="90"></label>
                 </div>
                 <div class="controls">
-                    <label data-lang="ru">Высота квадрата: <input type="range" id="rectHeight" value="0" min="0" max="100"></label>
-                    <label data-lang="en" style="display: none;">Square Height: <input type="range" id="rectHeight" value="0" min="0" max="100"></label>
+                    <label data-lang="ru">Высота квадрата: <input type="range" id="rectHeight" value="0" min="0" max="90"></label>
+                    <label data-lang="en" style="display: none;">Square Height: <input type="range" id="rectHeight" value="0" min="0" max="90"></label>
                 </div>
                 <div class="controls">
                     <label data-lang="ru">Позиция X: <input type="range" id="rectX" value="0" min="0" max="200"></label>
@@ -310,8 +275,8 @@
 
             <!-- Функции над вторым изображением -->
             <div class="image-section">
-                <h3 data-lang="ru">Работа с маской</h3>
-                <h3 data-lang="en" style="display: none;">Mask Operations</h3>
+                <h3 data-lang="ru">Настройки маски</h3>
+                <h3 data-lang="en" style="display: none;">Mask Settings</h3>
                 <div class="controls">
                     <label data-lang="ru">Порог: <input type="range" id="threshold" value="127" min="0" max="255"></label>
                     <label data-lang="en" style="display: none;">Threshold: <input type="range" id="threshold" value="127" min="0" max="255"></label>
@@ -319,12 +284,6 @@
                 <div class="controls">
                     <label data-lang="ru"><input type="checkbox" id="invert" checked> Инвертировать</label>
                     <label data-lang="en" style="display: none;"><input type="checkbox" id="invert" checked> Invert</label>
-                </div>
-                <div class="button-group">
-                    <button id="drawMask" data-lang="ru">Рисовать</button>
-                    <button id="drawMask" data-lang="en" style="display: none;">Draw</button>
-                    <button id="clearMask" data-lang="ru">Очистить маску</button>
-                    <button id="clearMask" data-lang="en" style="display: none;">Clear Mask</button>
                 </div>
             </div>
 
@@ -348,17 +307,13 @@
                 1. Загрузите изображение, нажав на кнопку "Выбрать файл".<br>
                 2. Используйте ползунки для настройки обрезки изображения и размеров квадрата.<br>
                 3. Настройте порог и инвертируйте изображение, если необходимо.<br>
-                4. Используйте кнопку "Рисовать", чтобы закрасить области, которые не должны учитываться в расчете площади.<br>
-                5. Нажмите "Очистить маску", чтобы удалить все закрашенные области.<br>
-                6. Результат площади отображается под вторым изображением.<br>
+                4. Результат площади отображается под изображением.<br>
             </p>
             <p data-lang="en" style="display: none;">
                 1. Upload an image by clicking the "Choose File" button.<br>
                 2. Use the sliders to adjust the image cropping and square dimensions.<br>
                 3. Set the threshold and invert the image if necessary.<br>
-                4. Use the "Draw" button to paint areas that should not be included in the area calculation.<br>
-                5. Click "Clear Mask" to remove all painted areas.<br>
-                6. The area result is displayed below the second image.<br>
+                4. The area result is displayed below the image.<br>
             </p>
             <button id="closeModal" data-lang="ru">Закрыть</button>
             <button id="closeModal" data-lang="en" style="display: none;">Close</button>
@@ -370,8 +325,6 @@
         let canvas, ctx, maskCanvas, maskCtx;
         let currentImage = null;
         let rectX = 0, rectY = 0;
-        let isDrawing = false;
-        let isDrawMode = false;
         let currentLanguage = 'ru'; // Текущий язык
 
         function onOpenCvReady() {
@@ -442,15 +395,21 @@
             maskCanvas.width = cropWidth;
             maskCanvas.height = cropHeight;
 
+            // Ограничение размеров квадрата до 90% от размеров изображения
+            const maxRectWidth = cropWidth * 0.9;
+            const maxRectHeight = cropHeight * 0.9;
+            const rectWidthValue = Math.min(width, maxRectWidth);
+            const rectHeightValue = Math.min(height, maxRectHeight);
+
             // Отрисовка обрезанного изображения и прямоугольника
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(currentImage, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
             ctx.strokeStyle = 'red';
             ctx.lineWidth = 2;
-            ctx.strokeRect(rectX, rectY, width, height);
+            ctx.strokeRect(rectX, rectY, rectWidthValue, rectHeightValue);
 
             // Подсчет пикселей и создание маски
-            const { pixels, mask } = countEnclosedPixels(canvas, width, height, threshold, invert);
+            const { pixels, mask } = countEnclosedPixels(canvas, rectWidthValue, rectHeightValue, threshold, invert);
             cv.imshow(maskCanvas, mask);
             document.querySelectorAll('#pixelCount').forEach(el => {
                 if (el.getAttribute('data-lang') === currentLanguage) {
@@ -485,42 +444,6 @@
                 input.addEventListener('input', processImage);
             });
 
-            // Очистка маски
-            document.getElementById('clearMask').addEventListener('click', () => {
-                maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
-                processImage();
-            });
-
-            // Включение/выключение режима рисования
-            document.getElementById('drawMask').addEventListener('click', () => {
-                isDrawMode = !isDrawMode;
-                document.querySelectorAll('#drawMask').forEach(el => {
-                    if (el.getAttribute('data-lang') === currentLanguage) {
-                        el.textContent = isDrawMode ? (currentLanguage === 'ru' ? "Закончить рисование" : "Stop Drawing") : (currentLanguage === 'ru' ? "Рисовать" : "Draw");
-                    }
-                });
-            });
-
-            // Рисование на маске
-            maskCanvas.addEventListener('mousedown', (e) => {
-                if (isDrawMode) {
-                    isDrawing = true;
-                    drawOnMask(e);
-                }
-            });
-
-            maskCanvas.addEventListener('mousemove', (e) => {
-                if (isDrawMode && isDrawing) drawOnMask(e);
-            });
-
-            maskCanvas.addEventListener('mouseup', () => {
-                isDrawing = false;
-            });
-
-            maskCanvas.addEventListener('mouseleave', () => {
-                isDrawing = false;
-            });
-
             // Открытие модального окна с инструкцией
             document.getElementById('instructionButton').addEventListener('click', () => {
                 document.getElementById('instructionModal').style.display = 'flex';
@@ -544,18 +467,6 @@
                 document.getElementById('languageButton').textContent = currentLanguage === 'ru' ? 'Switch to English' : 'Переключить на русский';
                 processImage(); // Обновляем текст площади
             });
-        }
-
-        function drawOnMask(e) {
-            const rect = maskCanvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-
-            maskCtx.fillStyle = 'black';
-            maskCtx.beginPath();
-            maskCtx.arc(x, y, 10, 0, Math.PI * 2); // Рисуем круг радиусом 10px
-            maskCtx.fill();
-            processImage();
         }
     </script>
 </body>
