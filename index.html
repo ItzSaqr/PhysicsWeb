@@ -254,12 +254,12 @@
                     <label data-lang="en" style="display: none;">Crop Bottom: <input type="range" id="cropBottom" value="0" min="0" max="100"></label>
                 </div>
                 <div class="controls">
-                    <label data-lang="ru">Ширина квадрата: <input type="range" id="rectWidth" value="0" min="0" max="90"></label>
-                    <label data-lang="en" style="display: none;">Square Width: <input type="range" id="rectWidth" value="0" min="0" max="90"></label>
+                    <label data-lang="ru">Ширина квадрата: <input type="range" id="rectWidth" value="0" min="0" max="150"></label>
+                    <label data-lang="en" style="display: none;">Square Width: <input type="range" id="rectWidth" value="0" min="0" max="150"></label>
                 </div>
                 <div class="controls">
-                    <label data-lang="ru">Высота квадрата: <input type="range" id="rectHeight" value="0" min="0" max="90"></label>
-                    <label data-lang="en" style="display: none;">Square Height: <input type="range" id="rectHeight" value="0" min="0" max="90"></label>
+                    <label data-lang="ru">Высота квадрата: <input type="range" id="rectHeight" value="0" min="0" max="150"></label>
+                    <label data-lang="en" style="display: none;">Square Height: <input type="range" id="rectHeight" value="0" min="0" max="150"></label>
                 </div>
                 <div class="controls">
                     <label data-lang="ru">Позиция X: <input type="range" id="rectX" value="0" min="0" max="200"></label>
@@ -307,13 +307,13 @@
                 1. Загрузите изображение, нажав на кнопку "Выбрать файл".<br>
                 2. Используйте ползунки для настройки обрезки изображения и размеров квадрата.<br>
                 3. Настройте порог и инвертируйте изображение, если необходимо.<br>
-                4. Результат площади отображается под изображением.<br>
+                4. Результат площади отображается под изображением (учитывается только самая большая зона).<br>
             </p>
             <p data-lang="en" style="display: none;">
                 1. Upload an image by clicking the "Choose File" button.<br>
                 2. Use the sliders to adjust the image cropping and square dimensions.<br>
                 3. Set the threshold and invert the image if necessary.<br>
-                4. The area result is displayed below the image.<br>
+                4. The area result is displayed below the image (only the largest zone is considered).<br>
             </p>
             <button id="closeModal" data-lang="ru">Закрыть</button>
             <button id="closeModal" data-lang="en" style="display: none;">Close</button>
@@ -355,8 +355,21 @@
             let hierarchy = new cv.Mat();
             cv.findContours(binary, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
 
+            // Находим самый большой контур
+            let maxArea = 0;
+            let maxContourIndex = -1;
+            for (let i = 0; i < contours.size(); i++) {
+                let contourArea = cv.contourArea(contours.get(i));
+                if (contourArea > maxArea) {
+                    maxArea = contourArea;
+                    maxContourIndex = i;
+                }
+            }
+
             let mask = new cv.Mat.zeros(binary.rows, binary.cols, cv.CV_8U);
-            cv.drawContours(mask, contours, -1, new cv.Scalar(255), cv.FILLED);
+            if (maxContourIndex !== -1) {
+                cv.drawContours(mask, contours, maxContourIndex, new cv.Scalar(255), cv.FILLED);
+            }
 
             let enclosedPixels = cv.countNonZero(mask);
             if (width > 0 && height > 0) {
@@ -395,9 +408,9 @@
             maskCanvas.width = cropWidth;
             maskCanvas.height = cropHeight;
 
-            // Ограничение размеров квадрата до 90% от размеров изображения
-            const maxRectWidth = cropWidth * 0.9;
-            const maxRectHeight = cropHeight * 0.9;
+            // Ограничение размеров квадрата до 150% от размеров изображения
+            const maxRectWidth = cropWidth * 1.5;
+            const maxRectHeight = cropHeight * 1.5;
             const rectWidthValue = Math.min(width, maxRectWidth);
             const rectHeightValue = Math.min(height, maxRectHeight);
 
