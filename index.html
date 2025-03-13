@@ -177,23 +177,6 @@
         .instruction-button:active {
             background: linear-gradient(145deg, #1e7e34, #19692c);
         }
-        .language-button {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 5px;
-            background: linear-gradient(145deg, #6c757d, #5a6268);
-            color: #fff;
-            font-size: 14px;
-            cursor: pointer;
-            transition: background 0.3s ease;
-            margin-top: 8px;
-        }
-        .language-button:hover {
-            background: linear-gradient(145deg, #5a6268, #495057);
-        }
-        .language-button:active {
-            background: linear-gradient(145deg, #495057, #343a40);
-        }
 
         /* Адаптация для мобильных устройств */
         @media (max-width: 600px) {
@@ -221,7 +204,7 @@
                 padding: 6px 12px;
                 font-size: 12px;
             }
-            .instruction-button, .language-button {
+            .instruction-button {
                 padding: 6px 12px;
                 font-size: 12px;
             }
@@ -235,39 +218,30 @@
             
             <!-- Функции над первым изображением -->
             <div class="image-section">
-                <h3 data-lang="ru">Обрезка и настройка квадрата</h3>
-                <h3 data-lang="en" style="display: none;">Cropping and Square Settings</h3>
+                <h3>Обрезка и настройка квадрата</h3>
                 <div class="controls">
-                    <label data-lang="ru">Обрезка слева: <input type="range" id="cropLeft" value="0" min="0" max="100"></label>
-                    <label data-lang="en" style="display: none;">Crop Left: <input type="range" id="cropLeft" value="0" min="0" max="100"></label>
+                    <label>Обрезка слева: <input type="range" id="cropLeft" value="0" min="0" max="100"></label>
                 </div>
                 <div class="controls">
-                    <label data-lang="ru">Обрезка сверху: <input type="range" id="cropTop" value="0" min="0" max="100"></label>
-                    <label data-lang="en" style="display: none;">Crop Top: <input type="range" id="cropTop" value="0" min="0" max="100"></label>
+                    <label>Обрезка сверху: <input type="range" id="cropTop" value="0" min="0" max="100"></label>
                 </div>
                 <div class="controls">
-                    <label data-lang="ru">Обрезка справа: <input type="range" id="cropRight" value="0" min="0" max="100"></label>
-                    <label data-lang="en" style="display: none;">Crop Right: <input type="range" id="cropRight" value="0" min="0" max="100"></label>
+                    <label>Обрезка справа: <input type="range" id="cropRight" value="0" min="0" max="100"></label>
                 </div>
                 <div class="controls">
-                    <label data-lang="ru">Обрезка снизу: <input type="range" id="cropBottom" value="0" min="0" max="100"></label>
-                    <label data-lang="en" style="display: none;">Crop Bottom: <input type="range" id="cropBottom" value="0" min="0" max="100"></label>
+                    <label>Обрезка снизу: <input type="range" id="cropBottom" value="0" min="0" max="100"></label>
                 </div>
                 <div class="controls">
-                    <label data-lang="ru">Ширина квадрата: <input type="range" id="rectWidth" value="0" min="0" max="150"></label>
-                    <label data-lang="en" style="display: none;">Square Width: <input type="range" id="rectWidth" value="0" min="0" max="150"></label>
+                    <label>Ширина квадрата: <input type="range" id="rectWidth" value="0" min="0" max="150"></label>
                 </div>
                 <div class="controls">
-                    <label data-lang="ru">Высота квадрата: <input type="range" id="rectHeight" value="0" min="0" max="150"></label>
-                    <label data-lang="en" style="display: none;">Square Height: <input type="range" id="rectHeight" value="0" min="0" max="150"></label>
+                    <label>Высота квадрата: <input type="range" id="rectHeight" value="0" min="0" max="150"></label>
                 </div>
                 <div class="controls">
-                    <label data-lang="ru">Позиция X: <input type="range" id="rectX" value="0" min="0" max="200"></label>
-                    <label data-lang="en" style="display: none;">Position X: <input type="range" id="rectX" value="0" min="0" max="200"></label>
+                    <label>Позиция X: <input type="range" id="rectX" value="0" min="0" max="200"></label>
                 </div>
                 <div class="controls">
-                    <label data-lang="ru">Позиция Y: <input type="range" id="rectY" value="0" min="0" max="200"></label>
-                    <label data-lang="en" style="display: none;">Position Y: <input type="range" id="rectY" value="0" min="0" max="200"></label>
+                    <label>Позиция Y: <input type="range" id="rectY" value="0" min="0" max="200"></label>
                 </div>
             </div>
 
@@ -275,48 +249,33 @@
 
             <!-- Функции над вторым изображением -->
             <div class="image-section">
-                <h3 data-lang="ru">Настройки маски</h3>
-                <h3 data-lang="en" style="display: none;">Mask Settings</h3>
+                <h3>Настройки маски</h3>
                 <div class="controls">
-                    <label data-lang="ru">Порог: <input type="range" id="threshold" value="127" min="0" max="255"></label>
-                    <label data-lang="en" style="display: none;">Threshold: <input type="range" id="threshold" value="127" min="0" max="255"></label>
+                    <label>Порог: <input type="range" id="threshold" value="127" min="0" max="255"></label>
                 </div>
                 <div class="controls">
-                    <label data-lang="ru"><input type="checkbox" id="invert" checked> Инвертировать</label>
-                    <label data-lang="en" style="display: none;"><input type="checkbox" id="invert" checked> Invert</label>
+                    <label><input type="checkbox" id="invert" checked> Инвертировать</label>
                 </div>
             </div>
 
             <canvas id="maskCanvas"></canvas>
-            <div id="pixelCount" data-lang="ru">Площадь: 0.00</div>
-            <div id="pixelCount" data-lang="en" style="display: none;">Area: 0.00</div>
-            <div class="credits" data-lang="ru">Разработчики: Рябов Ярослав, Кострикин Андрей, Рябко Владислав</div>
-            <div class="credits" data-lang="en" style="display: none;">Developers: Ryabov Yaroslav, Kostrikin Andrey, Ryabko Vladislav</div>
-            <button class="instruction-button" id="instructionButton" data-lang="ru">Инструкция</button>
-            <button class="instruction-button" id="instructionButton" data-lang="en" style="display: none;">Instructions</button>
-            <button class="language-button" id="languageButton">Switch to English</button>
+            <div id="pixelCount">Площадь: 0.00</div>
+            <div class="credits">Разработчики: Рябов Ярослав, Кострикин Андрей, Рябко Владислав</div>
+            <button class="instruction-button" id="instructionButton">Инструкция</button>
         </div>
     </div>
 
     <!-- Модальное окно для инструкции -->
     <div id="instructionModal" class="modal">
         <div class="modal-content">
-            <h2 data-lang="ru">Инструкция по использованию</h2>
-            <h2 data-lang="en" style="display: none;">Usage Instructions</h2>
-            <p data-lang="ru">
+            <h2>Инструкция по использованию</h2>
+            <p>
                 1. Загрузите изображение, нажав на кнопку "Выбрать файл".<br>
                 2. Используйте ползунки для настройки обрезки изображения и размеров квадрата.<br>
                 3. Настройте порог и инвертируйте изображение, если необходимо.<br>
                 4. Результат площади отображается под изображением (учитывается только самая большая зона).<br>
             </p>
-            <p data-lang="en" style="display: none;">
-                1. Upload an image by clicking the "Choose File" button.<br>
-                2. Use the sliders to adjust the image cropping and square dimensions.<br>
-                3. Set the threshold and invert the image if necessary.<br>
-                4. The area result is displayed below the image (only the largest zone is considered).<br>
-            </p>
-            <button id="closeModal" data-lang="ru">Закрыть</button>
-            <button id="closeModal" data-lang="en" style="display: none;">Close</button>
+            <button id="closeModal">Закрыть</button>
         </div>
     </div>
 
@@ -325,7 +284,6 @@
         let canvas, ctx, maskCanvas, maskCtx;
         let currentImage = null;
         let rectX = 0, rectY = 0;
-        let currentLanguage = 'ru'; // Текущий язык
 
         function onOpenCvReady() {
             console.log("OpenCV.js готов!");
@@ -424,11 +382,7 @@
             // Подсчет пикселей и создание маски
             const { pixels, mask } = countEnclosedPixels(canvas, rectWidthValue, rectHeightValue, threshold, invert);
             cv.imshow(maskCanvas, mask);
-            document.querySelectorAll('#pixelCount').forEach(el => {
-                if (el.getAttribute('data-lang') === currentLanguage) {
-                    el.textContent = currentLanguage === 'ru' ? `Площадь: ${pixels.toFixed(2)}` : `Area: ${pixels.toFixed(2)}`;
-                }
-            });
+            document.getElementById('pixelCount').textContent = `Площадь: ${pixels.toFixed(2)}`;
             mask.delete();
         }
 
@@ -465,20 +419,6 @@
             // Закрытие модального окна
             document.getElementById('closeModal').addEventListener('click', () => {
                 document.getElementById('instructionModal').style.display = 'none';
-            });
-
-            // Смена языка
-            document.getElementById('languageButton').addEventListener('click', () => {
-                currentLanguage = currentLanguage === 'ru' ? 'en' : 'ru';
-                document.querySelectorAll('[data-lang]').forEach(el => {
-                    if (el.getAttribute('data-lang') === currentLanguage) {
-                        el.style.display = 'block';
-                    } else {
-                        el.style.display = 'none';
-                    }
-                });
-                document.getElementById('languageButton').textContent = currentLanguage === 'ru' ? 'Switch to English' : 'Переключить на русский';
-                processImage(); // Обновляем текст площади
             });
         }
     </script>
