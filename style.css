@@ -40,23 +40,25 @@ canvas {
 .controls input[type="checkbox"] {
     margin-right: 10px;
 }
-.controls input[type="file"] {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #444;
-    border-radius: 5px;
-    background: linear-gradient(145deg, #007bff, #005bb5);
-    color: #fff;
-    cursor: pointer;
-    transition: background 0.3s ease;
-    text-align: center;
-    font-size: 14px;
-}
-.controls input[type="file"]:hover {
-    background: linear-gradient(145deg, #005bb5, #004080);
-}
-.controls input[type="file"]::file-selector-button {
+
+/* Скрываем стандартный input */
+.hidden-file-input {
     display: none;
+}
+
+/* Стили для кастомного элемента */
+.custom-file-input {
+display: inline-block;
+padding: 10px 20px;
+background-color: #007bff;
+color: white;
+border-radius: 5px;
+cursor: pointer;
+text-align: center;
+}
+
+.custom-file-input:hover {
+background-color: #0056b3;
 }
 .controls input[type="range"] {
     -webkit-appearance: none;
