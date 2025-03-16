@@ -26,16 +26,16 @@
                     <label>Обрезка снизу: <input type="range" id="cropBottom" value="0" min="0" max="100"></label>
                 </div>
                 <div class="controls">
-                    <label>Ширина квадрата: <input type="range" id="rectWidth" value="0" min="0" max="150"></label>
-                </div>
-                <div class="controls">
-                    <label>Высота квадрата: <input type="range" id="rectHeight" value="0" min="0" max="150"></label>
-                </div>
-                <div class="controls">
                     <label>Позиция X: <input type="range" id="rectX" value="0" min="0" max="200"></label>
                 </div>
                 <div class="controls">
                     <label>Позиция Y: <input type="range" id="rectY" value="0" min="0" max="200"></label>
+                </div>
+                <div class="controls">
+                    <label>Ширина квадрата: <input type="range" id="rectWidth" value="50" min="0" max="150"></label>
+                </div>
+                <div class="controls">
+                    <label>Высота квадрата: <input type="range" id="rectHeight" value="50" min="0" max="150"></label>
                 </div>
             </div>
 
@@ -45,7 +45,7 @@
             <div class="image-section">
                 <h3>Настройки маски</h3>
                 <div class="controls">
-                    <label>Порог: <input type="range" id="threshold" value="127" min="0" max="255"></label>
+                    <label>Граница цвета: <input type="range" id="threshold" value="127" min="0" max="255"></label>
                 </div>
                 <div class="controls">
                     <label><input type="checkbox" id="invert" checked> Инвертировать</label>
@@ -67,8 +67,7 @@
                 1. Сделайте фото петли на экране осциллографа (чем ровнее будет сделано фото, тем точнее будет результат вычислений).<br>
                 2. Загрузите изображение, нажав на кнопку "Выбрать файл" в верхней части страницы.<br>
                 3. Используйте ползунки для настройки обрезки границ изображения.<br>
-                4. Настройте размер прямоугольника под размеры квадрата на фото, используя ползунки.<br>
-                Если необходимо, также настройте положение прямоугольника, двигая его левый верхний угол при помощи соответствующих ползунков.<br>
+                4. Настройте размер прямоугольника под размеры квадрата на фото, используя ползунки. Также настройте положение прямоугольника, двигая его левый верхний угол при помощи соответствующих ползунков.<br>
                 5. Настройте границу цвета и инвертируйте изображение, если необходимо.<br>
                 6. Величина площади (в клетках) будет отображаться под изображением внизу страницы (учитывается только самая большая зона).<br>
             </p>
