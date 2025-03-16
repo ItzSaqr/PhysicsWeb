@@ -1,0 +1,140 @@
+        let canvas, ctx, maskCanvas, maskCtx;
+        let currentImage = null;
+        let rectX = 0, rectY = 0;
+
+        function onOpenCvReady() {
+            console.log("OpenCV.js готов!");
+            canvas = document.getElementById('canvas');
+            ctx = canvas.getContext('2d');
+            maskCanvas = document.getElementById('maskCanvas');
+            maskCtx = maskCanvas.getContext('2d');
+            setupEventListeners();
+        }
+
+        function countEnclosedPixels(imageCanvas, width, height, threshold, invert) {
+            let src = cv.imread(imageCanvas);
+            let gray = new cv.Mat();
+            cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
+
+            if (invert) {
+                cv.bitwise_not(gray, gray);
+            }
+
+            let binary = new cv.Mat();
+            cv.threshold(gray, binary, threshold, 255, cv.THRESH_BINARY_INV);
+
+            let kernel = cv.Mat.ones(3, 3, cv.CV_8U);
+            cv.morphologyEx(binary, binary, cv.MORPH_CLOSE, kernel);
+
+            let contours = new cv.MatVector();
+            let hierarchy = new cv.Mat();
+            cv.findContours(binary, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
+
+            // Находим самый большой контур
+            let maxArea = 0;
+            let maxContourIndex = -1;
+            for (let i = 0; i < contours.size(); i++) {
+                let contourArea = cv.contourArea(contours.get(i));
+                if (contourArea > maxArea) {
+                    maxArea = contourArea;
+                    maxContourIndex = i;
+                }
+            }
+
+            let mask = new cv.Mat.zeros(binary.rows, binary.cols, cv.CV_8U);
+            if (maxContourIndex !== -1) {
+                cv.drawContours(mask, contours, maxContourIndex, new cv.Scalar(255), cv.FILLED);
+            }
+
+            let enclosedPixels = cv.countNonZero(mask);
+            if (width > 0 && height > 0) {
+                enclosedPixels /= (width * height);
+            }
+
+            gray.delete(); binary.delete(); kernel.delete();
+            contours.delete(); hierarchy.delete(); src.delete();
+
+            return { pixels: enclosedPixels, mask: mask };
+        }
+
+        function processImage() {
+            if (!currentImage) return;
+
+            const width = parseInt(document.getElementById('rectWidth').value);
+            const height = parseInt(document.getElementById('rectHeight').value);
+            const threshold = parseInt(document.getElementById('threshold').value);
+            const invert = document.getElementById('invert').checked;
+            const cropLeft = parseInt(document.getElementById('cropLeft').value);
+            const cropTop = parseInt(document.getElementById('cropTop').value);
+            const cropRight = parseInt(document.getElementById('cropRight').value);
+            const cropBottom = parseInt(document.getElementById('cropBottom').value);
+
+            // Расчет области обрезки
+            const imgWidth = currentImage.width;
+            const imgHeight = currentImage.height;
+            const cropX = (imgWidth * cropLeft) / 100;
+            const cropY = (imgHeight * cropTop) / 100;
+            const cropWidth = imgWidth - cropX - (imgWidth * cropRight) / 100;
+            const cropHeight = imgHeight - cropY - (imgHeight * cropBottom) / 100;
+
+            // Обновление размеров канваса
+            canvas.width = cropWidth;
+            canvas.height = cropHeight;
+            maskCanvas.width = cropWidth;
+            maskCanvas.height = cropHeight;
+
+            // Ограничение размеров квадрата до 150% от размеров изображения
+            const maxRectWidth = cropWidth * 1.5;
+            const maxRectHeight = cropHeight * 1.5;
+            const rectWidthValue = Math.min(width, maxRectWidth);
+            const rectHeightValue = Math.min(height, maxRectHeight);
+
+            // Отрисовка обрезанного изображения и прямоугольника
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(currentImage, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
+            ctx.strokeStyle = 'blue';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(rectX, rectY, rectWidthValue, rectHeightValue);
+
+            // Подсчет пикселей и создание маски
+            const { pixels, mask } = countEnclosedPixels(canvas, rectWidthValue, rectHeightValue, threshold, invert);
+            cv.imshow(maskCanvas, mask);
+            document.getElementById('pixelCount').textContent = `Площадь: ${pixels.toFixed(2)}`;
+            mask.delete();
+        }
+
+        function setupEventListeners() {
+            document.getElementById('imageInput').addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                const img = new Image();
+                img.onload = () => {
+                    currentImage = img;
+                    processImage();
+                };
+                img.src = URL.createObjectURL(file);
+            });
+
+            document.getElementById('rectX').addEventListener('input', (e) => {
+                rectX = parseInt(e.target.value);
+                processImage();
+            });
+
+            document.getElementById('rectY').addEventListener('input', (e) => {
+                rectY = parseInt(e.target.value);
+                processImage();
+            });
+
+            document.querySelectorAll('.controls input').forEach(input => {
+                input.addEventListener('input', processImage);
+            });
+
+            // Открытие модального окна с инструкцией
+            document.getElementById('instructionButton').addEventListener('click', () => {
+                document.getElementById('instructionModal').style.display = 'flex';
+            });
+
+            // Закрытие модального окна
+            document.getElementById('closeModal').addEventListener('click', () => {
+                document.getElementById('instructionModal').style.display = 'none';
+            });
+        }
