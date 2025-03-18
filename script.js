@@ -1,6 +1,7 @@
-let canvas, ctx, maskCanvas, maskCtx;
+let canvas, ctx, maskCanvas, maskCtx, editCanvas, editCtx;
 let currentImage = null;
 let rectX = 0, rectY = 0;
+let isDrawing = false;
 
 function onOpenCvReady() {
     console.log("OpenCV.js готов!");
@@ -8,6 +9,8 @@ function onOpenCvReady() {
     ctx = canvas.getContext('2d');
     maskCanvas = document.getElementById('maskCanvas');
     maskCtx = maskCanvas.getContext('2d');
+    editCanvas = document.getElementById('editCanvas');
+    editCtx = editCanvas.getContext('2d');
     setupEventListeners();
 }
 
@@ -83,7 +86,6 @@ function processImage() {
     maskCanvas.width = cropWidth;
     maskCanvas.height = cropHeight;
 
-    // Ограничение размеров квадрата до 150% от размеров изображения
     const maxRectWidth = cropWidth * 1.5;
     const maxRectHeight = cropHeight * 1.5;
     const rectWidthValue = Math.min(width, maxRectWidth);
@@ -92,7 +94,7 @@ function processImage() {
     // Отрисовка обрезанного изображения и прямоугольника
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(currentImage, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
-    ctx.strokeStyle = 'blue';
+    ctx.strokeStyle = 'red';
     ctx.lineWidth = 2;
     ctx.strokeRect(rectX, rectY, rectWidthValue, rectHeightValue);
 
@@ -109,7 +111,10 @@ function setupEventListeners() {
         const img = new Image();
         img.onload = () => {
             currentImage = img;
-            processImage();
+            editCanvas.width = img.width;
+            editCanvas.height = img.height;
+            editCtx.drawImage(img, 0, 0);
+            document.getElementById('editModal').style.display = 'flex';
         };
         img.src = URL.createObjectURL(file);
     });
@@ -136,5 +141,84 @@ function setupEventListeners() {
     // Закрытие модального окна
     document.getElementById('closeModal').addEventListener('click', () => {
         document.getElementById('instructionModal').style.display = 'none';
+    });
+
+    // Сохранение отредактированного изображения
+    document.getElementById('saveEdit').addEventListener('click', () => {
+        currentImage = new Image();
+        currentImage.src = editCanvas.toDataURL();
+        document.getElementById('editModal').style.display = 'none';
+        processImage(); // Вызываем processImage сразу после сохранения
+    });
+
+    // Очистка Canvas
+    document.getElementById('clearEdit').addEventListener('click', () => {
+        editCtx.clearRect(0, 0, editCanvas.width, editCanvas.height);
+        editCtx.drawImage(currentImage, 0, 0);
+    });
+
+    // Рисование на Canvas (мышь)
+    editCanvas.addEventListener('mousedown', (e) => {
+        isDrawing = true;
+        editCtx.beginPath();
+        editCtx.moveTo(e.offsetX, e.offsetY);
+    });
+
+    editCanvas.addEventListener('mousemove', (e) => {
+        if (isDrawing) {
+            editCtx.lineTo(e.offsetX, e.offsetY);
+            editCtx.strokeStyle = 'black';
+            editCtx.lineWidth = 10;
+            editCtx.stroke();
+        }
+    });
+
+    editCanvas.addEventListener('mouseup', () => {
+        isDrawing = false;
+    });
+
+    editCanvas.addEventListener('mouseleave', () => {
+        isDrawing = false;
+    });
+
+    // Рисование на Canvas (сенсорные устройства)
+    editCanvas.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 1) { // Рисуем только при одном касании
+            const touch = e.touches[0];
+            const rect = editCanvas.getBoundingClientRect();
+            const scaleX = editCanvas.width / rect.width; // Масштабирование по X
+            const scaleY = editCanvas.height / rect.height; // Масштабирование по Y
+            const offsetX = (touch.clientX - rect.left) * scaleX;
+            const offsetY = (touch.clientY - rect.top) * scaleY;
+            isDrawing = true;
+            editCtx.beginPath();
+            editCtx.moveTo(offsetX, offsetY);
+        }
+    });
+
+    editCanvas.addEventListener('touchmove', (e) => {
+        if (isDrawing && e.touches.length === 1) { // Рисуем только при одном касании
+            const touch = e.touches[0];
+            const rect = editCanvas.getBoundingClientRect();
+            const scaleX = editCanvas.width / rect.width; // Масштабирование по X
+            const scaleY = editCanvas.height / rect.height; // Масштабирование по Y
+            const offsetX = (touch.clientX - rect.left) * scaleX;
+            const offsetY = (touch.clientY - rect.top) * scaleY;
+            editCtx.lineTo(offsetX, offsetY);
+            editCtx.strokeStyle = 'black';
+            editCtx.lineWidth = 10;
+            editCtx.stroke();
+        } else {
+            // Если не рисуем, разрешаем прокрутку страницы
+            e.preventDefault();
+        }
+    });
+
+    editCanvas.addEventListener('touchend', () => {
+        isDrawing = false;
+    });
+
+    editCanvas.addEventListener('touchcancel', () => {
+        isDrawing = false;
     });
 }

@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Обработка изображений с OpenCV.js</title>
+    <title>Квадратики</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/png" href="favicon.png">
     <script src="opencv.js" onload="onOpenCvReady();" async></script>
+    <script src="script.js"></script>
 </head>
 <body>
     <div class="container">
@@ -15,9 +16,21 @@
                 Выберите файл
             </label>
             <input type="file" id="imageInput" class="hidden-file-input" accept="image/*">
-            <!-- <input type="file" id="imageInput" accept="image/*"> -->
+            <!-- Модальное окно для редактирования изображения -->
+            <div id="editModal" class="modal">
+                <div class="modal-content">
+                    <h2>Редактирование изображения</h2>
+                    <p>Закрасьте лишние элементы изображения черным цветом.</p>
+                    <div class="canvas-container">
+                        <canvas id="editCanvas"></canvas>
+                    </div>
+                    <div class="modal-buttons">
+                        <button id="clearEdit">Очистить</button>
+                        <button id="saveEdit">Сохранить и продолжить</button>
+                    </div>
+                </div>
+            </div>
 
-            <!-- Функции над первым изображением -->
             <div class="image-section">
                 <h3>Обрезка и настройка квадрата</h3>
                 <div class="controls">
@@ -33,26 +46,25 @@
                     <label>Обрезка снизу: <input type="range" id="cropBottom" value="0" min="0" max="100"></label>
                 </div>
                 <div class="controls">
-                    <label>Позиция X: <input type="range" id="rectX" value="0" min="0" max="200"></label>
+                    <label>Ширина квадрата: <input type="range" id="rectWidth" value="30" min="0" max="250"></label>
                 </div>
                 <div class="controls">
-                    <label>Позиция Y: <input type="range" id="rectY" value="0" min="0" max="200"></label>
+                    <label>Высота квадрата: <input type="range" id="rectHeight" value="30" min="0" max="250"></label>
                 </div>
                 <div class="controls">
-                    <label>Ширина квадрата: <input type="range" id="rectWidth" value="50" min="0" max="150"></label>
+                    <label>Позиция X: <input type="range" id="rectX" value="0" min="0" max="300"></label>
                 </div>
                 <div class="controls">
-                    <label>Высота квадрата: <input type="range" id="rectHeight" value="50" min="0" max="150"></label>
+                    <label>Позиция Y: <input type="range" id="rectY" value="0" min="0" max="300"></label>
                 </div>
             </div>
 
             <canvas id="canvas"></canvas>
 
-            <!-- Функции над вторым изображением -->
             <div class="image-section">
                 <h3>Настройки маски</h3>
                 <div class="controls">
-                    <label>Граница цвета: <input type="range" id="threshold" value="127" min="0" max="255"></label>
+                    <label>Порог: <input type="range" id="threshold" value="127" min="0" max="255"></label>
                 </div>
                 <div class="controls">
                     <label><input type="checkbox" id="invert" checked> Инвертировать</label>
@@ -61,26 +73,33 @@
 
             <canvas id="maskCanvas"></canvas>
             <div id="pixelCount">Площадь: 0.00</div>
-            <div class="credits">Разработчики: Рябов Ярослав, Кострикин Андрей, Рябко Владислав</div>
             <button class="instruction-button" id="instructionButton">Инструкция</button>
         </div>
     </div>
 
-    <!-- Модальное окно для инструкции -->
     <div id="instructionModal" class="modal">
         <div class="modal-content">
             <h2>Инструкция по использованию</h2>
             <p>
                 1. Сделайте фото петли на экране осциллографа (чем ровнее будет сделано фото, тем точнее будет результат вычислений).<br>
                 2. Загрузите изображение, нажав на кнопку "Выбрать файл" в верхней части страницы.<br>
-                3. Используйте ползунки для настройки обрезки границ изображения.<br>
-                4. Настройте размер прямоугольника под размеры квадрата на фото, используя ползунки. Также настройте положение прямоугольника, двигая его левый верхний угол при помощи соответствующих ползунков.<br>
-                5. Настройте границу цвета и инвертируйте изображение, если необходимо.<br>
-                6. Величина площади (в клетках) будет отображаться под изображением внизу страницы (учитывается только самая большая зона).<br>
+                3. При необходимости закрасьте черным цветом ненужные участки изображения.<br>
+                4. Используйте ползунки для настройки обрезки границ изображения.<br>
+                5. Настройте размер прямоугольника под размеры квадрата на фото, используя ползунки. Также настройте положение прямоугольника, двигая его левый верхний угол при помощи соответствующих ползунков.<br>
+                6. Настройте границу цвета и инвертируйте изображение, если необходимо.<br>
+                7. Величина площади (в клетках) будет отображаться под изображением внизу страницы (учитывается только самая большая зона).<br>
             </p>
-            <button id="closeModal">Закрыть</button>
+            <button class="instruction-button" id="closeModal">Закрыть</button>
         </div>
     </div>
-    <script src="script.js"></script>
+
+    <footer>
+        <div>
+            <p>Разработано командой: Рябов Ярослав, Кострикин Андрей, Рябко Владислав</p>
+            <p><a href="https://github.com/ItzSaqr/PhysicsWeb" target="_blank">GitHub репозиторий</a></p>
+            <p>Поддержка: physicsweb2025@gmail.com</p>
+            <p>© 2025 Все права защищены. :)</p>
+        </div>
+    </footer>
 </body>
 </html>
