@@ -1,86 +1,511 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Обработка изображений с OpenCV.js</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <link rel="icon" type="image/png" href="favicon.png">
-    <script src="opencv.js" onload="onOpenCvReady();" async></script>
+    <title>РћР±СЂР°Р±РѕС‚РєР° РёР·РѕР±СЂР°Р¶РµРЅРёР№ СЃ OpenCV.js</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" charset="UTF-8">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #1e1e1e;
+            margin: 0;
+            padding: 10px;
+            color: #e0e0e0;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #2d2d2d;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+        canvas {
+            border: 1px solid #444;
+            border-radius: 5px;
+            margin-top: 10px;
+            background: #1e1e1e;
+            max-width: 100%;
+            height: auto;
+        }
+        .controls {
+            margin: 10px 0;
+        }
+        .controls label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #e0e0e0;
+            font-size: 14px;
+        }
+        .controls input[type="range"] {
+            width: 100%;
+        }
+        .controls input[type="checkbox"] {
+            margin-right: 10px;
+        }
+        .controls input[type="file"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #444;
+            border-radius: 5px;
+            background: linear-gradient(145deg, #007bff, #005bb5);
+            color: #fff;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            text-align: center;
+            font-size: 14px;
+        }
+        .controls input[type="file"]:hover {
+            background: linear-gradient(145deg, #005bb5, #004080);
+        }
+        .controls input[type="file"]::file-selector-button {
+            display: none;
+        }
+        .controls input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 6px;
+            background: #444;
+            border-radius: 5px;
+            outline: none;
+        }
+        .controls input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #007bff;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .controls input[type="range"]::-webkit-slider-thumb:hover {
+            background: #005bb5;
+        }
+        .controls input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            background: #007bff;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .controls input[type="range"]::-moz-range-thumb:hover {
+            background: #005bb5;
+        }
+        #pixelCount {
+            margin-top: 15px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #007bff;
+            text-align: center;
+            padding: 8px;
+            background: #1e1e1e;
+            border-radius: 5px;
+            border: 1px solid #444;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        .image-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .image-section {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .credits {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #888;
+            text-align: center;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #2d2d2d;
+            padding: 15px;
+            border-radius: 10px;
+            max-width: 90%;
+            width: 100%;
+            color: #e0e0e0;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            max-height: 90vh;
+        }
+        .modal-content h2 {
+            margin-top: 0;
+            font-size: 18px;
+        }
+        .modal-content .canvas-container {
+            overflow: auto; /* РџСЂРѕРєСЂСѓС‚РєР° РґР»СЏ Canvas */
+            max-height: 70vh;
+            border: 1px solid #444;
+            border-radius: 5px;
+            background: #1e1e1e;
+        }
+        .modal-content canvas {
+            display: block; /* РЈР±РёСЂР°РµРј Р»РёС€РЅРёРµ РѕС‚СЃС‚СѓРїС‹ */
+        }
+        .modal-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        .modal-buttons button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .modal-buttons button#clearEdit {
+            background: linear-gradient(145deg, #dc3545, #c82333);
+            color: #fff;
+        }
+        .modal-buttons button#clearEdit:hover {
+            background: linear-gradient(145deg, #c82333, #bd2130);
+        }
+        .modal-buttons button#saveEdit {
+            background: linear-gradient(145deg, #28a745, #218838);
+            color: #fff;
+        }
+        .modal-buttons button#saveEdit:hover {
+            background: linear-gradient(145deg, #218838, #1e7e34);
+        }
+        .instruction-button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            background: linear-gradient(145deg, #28a745, #218838);
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .instruction-button:hover {
+            background: linear-gradient(145deg, #218838, #1e7e34);
+        }
+        .instruction-button:active {
+            background: linear-gradient(145deg, #1e7e34, #19692c);
+        }
+
+        /* РђРґР°РїС‚Р°С†РёСЏ РґР»СЏ РјРѕР±РёР»СЊРЅС‹С… СѓСЃС‚СЂРѕР№СЃС‚РІ */
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            .controls label {
+                font-size: 12px;
+            }
+            .controls input[type="file"] {
+                padding: 6px;
+                font-size: 12px;
+            }
+            #pixelCount {
+                font-size: 16px;
+                padding: 6px;
+            }
+            .modal-content {
+                padding: 10px;
+            }
+            .modal-content h2 {
+                font-size: 16px;
+            }
+            .modal-content button {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+            .instruction-button {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <div class="image-container">
-            <label for="imageInput" class="custom-file-input">
-                Выберите файл
-            </label>
-            <input type="file" id="imageInput" class="hidden-file-input" accept="image/*">
-            <!-- <input type="file" id="imageInput" accept="image/*"> -->
-            
-            <!-- Функции над первым изображением -->
+            <input type="file" id="imageInput" accept="image/*">
+
+            <!-- РњРѕРґР°Р»СЊРЅРѕРµ РѕРєРЅРѕ РґР»СЏ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ -->
+            <div id="editModal" class="modal">
+                <div class="modal-content">
+                    <h2>Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ</h2>
+                    <p>Р—Р°РєСЂР°СЃСЊС‚Рµ Р»РёС€РЅРёРµ СЌР»РµРјРµРЅС‚С‹ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ С‡РµСЂРЅС‹Рј С†РІРµС‚РѕРј.</p>
+                    <div class="canvas-container">
+                        <canvas id="editCanvas"></canvas>
+                    </div>
+                    <div class="modal-buttons">
+                        <button id="clearEdit">РћС‡РёСЃС‚РёС‚СЊ</button>
+                        <button id="saveEdit">РЎРѕС…СЂР°РЅРёС‚СЊ Рё РїСЂРѕРґРѕР»Р¶РёС‚СЊ</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- РћСЃС‚Р°Р»СЊРЅРѕР№ РєРѕРґ РѕСЃС‚Р°РµС‚СЃСЏ Р±РµР· РёР·РјРµРЅРµРЅРёР№ -->
             <div class="image-section">
-                <h3>Обрезка и настройка квадрата</h3>
+                <h3>РћР±СЂРµР·РєР° Рё РЅР°СЃС‚СЂРѕР№РєР° РєРІР°РґСЂР°С‚Р°</h3>
                 <div class="controls">
-                    <label>Обрезка слева: <input type="range" id="cropLeft" value="0" min="0" max="100"></label>
+                    <label>РћР±СЂРµР·РєР° СЃР»РµРІР°: <input type="range" id="cropLeft" value="0" min="0" max="100"></label>
                 </div>
                 <div class="controls">
-                    <label>Обрезка сверху: <input type="range" id="cropTop" value="0" min="0" max="100"></label>
+                    <label>РћР±СЂРµР·РєР° СЃРІРµСЂС…Сѓ: <input type="range" id="cropTop" value="0" min="0" max="100"></label>
                 </div>
                 <div class="controls">
-                    <label>Обрезка справа: <input type="range" id="cropRight" value="0" min="0" max="100"></label>
+                    <label>РћР±СЂРµР·РєР° СЃРїСЂР°РІР°: <input type="range" id="cropRight" value="0" min="0" max="100"></label>
                 </div>
                 <div class="controls">
-                    <label>Обрезка снизу: <input type="range" id="cropBottom" value="0" min="0" max="100"></label>
+                    <label>РћР±СЂРµР·РєР° СЃРЅРёР·Сѓ: <input type="range" id="cropBottom" value="0" min="0" max="100"></label>
                 </div>
                 <div class="controls">
-                    <label>Позиция X: <input type="range" id="rectX" value="0" min="0" max="200"></label>
+                    <label>РЁРёСЂРёРЅР° РєРІР°РґСЂР°С‚Р°: <input type="range" id="rectWidth" value="0" min="0" max="150"></label>
                 </div>
                 <div class="controls">
-                    <label>Позиция Y: <input type="range" id="rectY" value="0" min="0" max="200"></label>
+                    <label>Р’С‹СЃРѕС‚Р° РєРІР°РґСЂР°С‚Р°: <input type="range" id="rectHeight" value="0" min="0" max="150"></label>
                 </div>
                 <div class="controls">
-                    <label>Ширина квадрата: <input type="range" id="rectWidth" value="50" min="0" max="150"></label>
+                    <label>РџРѕР·РёС†РёСЏ X: <input type="range" id="rectX" value="0" min="0" max="200"></label>
                 </div>
                 <div class="controls">
-                    <label>Высота квадрата: <input type="range" id="rectHeight" value="50" min="0" max="150"></label>
+                    <label>РџРѕР·РёС†РёСЏ Y: <input type="range" id="rectY" value="0" min="0" max="200"></label>
                 </div>
             </div>
 
             <canvas id="canvas"></canvas>
 
-            <!-- Функции над вторым изображением -->
+            <!-- Р¤СѓРЅРєС†РёРё РЅР°Рґ РІС‚РѕСЂС‹Рј РёР·РѕР±СЂР°Р¶РµРЅРёРµРј -->
             <div class="image-section">
-                <h3>Настройки маски</h3>
+                <h3>РќР°СЃС‚СЂРѕР№РєРё РјР°СЃРєРё</h3>
                 <div class="controls">
-                    <label>Граница цвета: <input type="range" id="threshold" value="127" min="0" max="255"></label>
+                    <label>РџРѕСЂРѕРі: <input type="range" id="threshold" value="127" min="0" max="255"></label>
                 </div>
                 <div class="controls">
-                    <label><input type="checkbox" id="invert" checked> Инвертировать</label>
+                    <label><input type="checkbox" id="invert" checked> РРЅРІРµСЂС‚РёСЂРѕРІР°С‚СЊ</label>
                 </div>
             </div>
 
             <canvas id="maskCanvas"></canvas>
-            <div id="pixelCount">Площадь: 0.00</div>
-            <div class="credits">Разработчики: Рябов Ярослав, Кострикин Андрей, Рябко Владислав</div>
-            <button class="instruction-button" id="instructionButton">Инструкция</button>
+            <div id="pixelCount">РџР»РѕС‰Р°РґСЊ: 0.00</div>
+            <div class="credits">Р Р°Р·СЂР°Р±РѕС‚С‡РёРєРё: Р СЏР±РѕРІ РЇСЂРѕСЃР»Р°РІ, РљРѕСЃС‚СЂРёРєРёРЅ РђРЅРґСЂРµР№, Р СЏР±РєРѕ Р’Р»Р°РґРёСЃР»Р°РІ</div>
+            <button class="instruction-button" id="instructionButton">РРЅСЃС‚СЂСѓРєС†РёСЏ</button>
         </div>
     </div>
 
-    <!-- Модальное окно для инструкции -->
+    <!-- РњРѕРґР°Р»СЊРЅРѕРµ РѕРєРЅРѕ РґР»СЏ РёРЅСЃС‚СЂСѓРєС†РёРё -->
     <div id="instructionModal" class="modal">
         <div class="modal-content">
-            <h2>Инструкция по использованию</h2>
+            <h2>РРЅСЃС‚СЂСѓРєС†РёСЏ РїРѕ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЋ</h2>
             <p>
-                1. Сделайте фото петли на экране осциллографа (чем ровнее будет сделано фото, тем точнее будет результат вычислений).<br>
-                2. Загрузите изображение, нажав на кнопку "Выбрать файл" в верхней части страницы.<br>
-                3. Используйте ползунки для настройки обрезки границ изображения.<br>
-                4. Настройте размер прямоугольника под размеры квадрата на фото, используя ползунки. Также настройте положение прямоугольника, двигая его левый верхний угол при помощи соответствующих ползунков.<br>
-                5. Настройте границу цвета и инвертируйте изображение, если необходимо.<br>
-                6. Величина площади (в клетках) будет отображаться под изображением внизу страницы (учитывается только самая большая зона).<br>
+                1. Р—Р°РіСЂСѓР·РёС‚Рµ РёР·РѕР±СЂР°Р¶РµРЅРёРµ, РЅР°Р¶Р°РІ РЅР° РєРЅРѕРїРєСѓ "Р’С‹Р±СЂР°С‚СЊ С„Р°Р№Р»".<br>
+                2. РСЃРїРѕР»СЊР·СѓР№С‚Рµ РїРѕР»Р·СѓРЅРєРё РґР»СЏ РЅР°СЃС‚СЂРѕР№РєРё РѕР±СЂРµР·РєРё РёР·РѕР±СЂР°Р¶РµРЅРёСЏ Рё СЂР°Р·РјРµСЂРѕРІ РєРІР°РґСЂР°С‚Р°.<br>
+                3. РќР°СЃС‚СЂРѕР№С‚Рµ РїРѕСЂРѕРі Рё РёРЅРІРµСЂС‚РёСЂСѓР№С‚Рµ РёР·РѕР±СЂР°Р¶РµРЅРёРµ, РµСЃР»Рё РЅРµРѕР±С…РѕРґРёРјРѕ.<br>
+                4. Р РµР·СѓР»СЊС‚Р°С‚ РїР»РѕС‰Р°РґРё РѕС‚РѕР±СЂР°Р¶Р°РµС‚СЃСЏ РїРѕРґ РёР·РѕР±СЂР°Р¶РµРЅРёРµРј (СѓС‡РёС‚С‹РІР°РµС‚СЃСЏ С‚РѕР»СЊРєРѕ СЃР°РјР°СЏ Р±РѕР»СЊС€Р°СЏ Р·РѕРЅР°).<br>
             </p>
-            <button id="closeModal">Закрыть</button>
+            <button id="closeModal">Р—Р°РєСЂС‹С‚СЊ</button>
         </div>
     </div>
-    <script src="script.js"></script>
+
+    <script src="https://docs.opencv.org/4.9.0/opencv.js" onload="onOpenCvReady();" async></script>
+    <script>
+        let canvas, ctx, maskCanvas, maskCtx, editCanvas, editCtx;
+        let currentImage = null;
+        let rectX = 0, rectY = 0;
+        let isDrawing = false;
+
+        function onOpenCvReady() {
+            console.log("OpenCV.js РіРѕС‚РѕРІ!");
+            canvas = document.getElementById('canvas');
+            ctx = canvas.getContext('2d');
+            maskCanvas = document.getElementById('maskCanvas');
+            maskCtx = maskCanvas.getContext('2d');
+            editCanvas = document.getElementById('editCanvas');
+            editCtx = editCanvas.getContext('2d');
+            setupEventListeners();
+        }
+
+        function countEnclosedPixels(imageCanvas, width, height, threshold, invert) {
+            let src = cv.imread(imageCanvas);
+            let gray = new cv.Mat();
+            cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
+
+            if (invert) {
+                cv.bitwise_not(gray, gray);
+            }
+
+            let binary = new cv.Mat();
+            cv.threshold(gray, binary, threshold, 255, cv.THRESH_BINARY_INV);
+
+            let kernel = cv.Mat.ones(3, 3, cv.CV_8U);
+            cv.morphologyEx(binary, binary, cv.MORPH_CLOSE, kernel);
+
+            let contours = new cv.MatVector();
+            let hierarchy = new cv.Mat();
+            cv.findContours(binary, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
+
+            // РќР°С…РѕРґРёРј СЃР°РјС‹Р№ Р±РѕР»СЊС€РѕР№ РєРѕРЅС‚СѓСЂ
+            let maxArea = 0;
+            let maxContourIndex = -1;
+            for (let i = 0; i < contours.size(); i++) {
+                let contourArea = cv.contourArea(contours.get(i));
+                if (contourArea > maxArea) {
+                    maxArea = contourArea;
+                    maxContourIndex = i;
+                }
+            }
+
+            let mask = new cv.Mat.zeros(binary.rows, binary.cols, cv.CV_8U);
+            if (maxContourIndex !== -1) {
+                cv.drawContours(mask, contours, maxContourIndex, new cv.Scalar(255), cv.FILLED);
+            }
+
+            let enclosedPixels = cv.countNonZero(mask);
+            if (width > 0 && height > 0) {
+                enclosedPixels /= (width * height);
+            }
+
+            gray.delete(); binary.delete(); kernel.delete();
+            contours.delete(); hierarchy.delete(); src.delete();
+
+            return { pixels: enclosedPixels, mask: mask };
+        }
+
+        function processImage() {
+            if (!currentImage) return;
+
+            const width = parseInt(document.getElementById('rectWidth').value);
+            const height = parseInt(document.getElementById('rectHeight').value);
+            const threshold = parseInt(document.getElementById('threshold').value);
+            const invert = document.getElementById('invert').checked;
+            const cropLeft = parseInt(document.getElementById('cropLeft').value);
+            const cropTop = parseInt(document.getElementById('cropTop').value);
+            const cropRight = parseInt(document.getElementById('cropRight').value);
+            const cropBottom = parseInt(document.getElementById('cropBottom').value);
+
+            // Р Р°СЃС‡РµС‚ РѕР±Р»Р°СЃС‚Рё РѕР±СЂРµР·РєРё
+            const imgWidth = currentImage.width;
+            const imgHeight = currentImage.height;
+            const cropX = (imgWidth * cropLeft) / 100;
+            const cropY = (imgHeight * cropTop) / 100;
+            const cropWidth = imgWidth - cropX - (imgWidth * cropRight) / 100;
+            const cropHeight = imgHeight - cropY - (imgHeight * cropBottom) / 100;
+
+            // РћР±РЅРѕРІР»РµРЅРёРµ СЂР°Р·РјРµСЂРѕРІ РєР°РЅРІР°СЃР°
+            canvas.width = cropWidth;
+            canvas.height = cropHeight;
+            maskCanvas.width = cropWidth;
+            maskCanvas.height = cropHeight;
+
+            // РћРіСЂР°РЅРёС‡РµРЅРёРµ СЂР°Р·РјРµСЂРѕРІ РєРІР°РґСЂР°С‚Р° РґРѕ 150% РѕС‚ СЂР°Р·РјРµСЂРѕРІ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
+            const maxRectWidth = cropWidth * 1.5;
+            const maxRectHeight = cropHeight * 1.5;
+            const rectWidthValue = Math.min(width, maxRectWidth);
+            const rectHeightValue = Math.min(height, maxRectHeight);
+
+            // РћС‚СЂРёСЃРѕРІРєР° РѕР±СЂРµР·Р°РЅРЅРѕРіРѕ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ Рё РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРёРєР°
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(currentImage, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
+            ctx.strokeStyle = 'red';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(rectX, rectY, rectWidthValue, rectHeightValue);
+
+            // РџРѕРґСЃС‡РµС‚ РїРёРєСЃРµР»РµР№ Рё СЃРѕР·РґР°РЅРёРµ РјР°СЃРєРё
+            const { pixels, mask } = countEnclosedPixels(canvas, rectWidthValue, rectHeightValue, threshold, invert);
+            cv.imshow(maskCanvas, mask);
+            document.getElementById('pixelCount').textContent = `РџР»РѕС‰Р°РґСЊ: ${pixels.toFixed(2)}`;
+            mask.delete();
+        }
+
+        function setupEventListeners() {
+            document.getElementById('imageInput').addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                const img = new Image();
+                img.onload = () => {
+                    currentImage = img;
+                    editCanvas.width = img.width;
+                    editCanvas.height = img.height;
+                    editCtx.drawImage(img, 0, 0);
+                    document.getElementById('editModal').style.display = 'flex';
+                };
+                img.src = URL.createObjectURL(file);
+            });
+
+            document.getElementById('rectX').addEventListener('input', (e) => {
+                rectX = parseInt(e.target.value);
+                processImage();
+            });
+
+            document.getElementById('rectY').addEventListener('input', (e) => {
+                rectY = parseInt(e.target.value);
+                processImage();
+            });
+
+            document.querySelectorAll('.controls input').forEach(input => {
+                input.addEventListener('input', processImage);
+            });
+
+            // РћС‚РєСЂС‹С‚РёРµ РјРѕРґР°Р»СЊРЅРѕРіРѕ РѕРєРЅР° СЃ РёРЅСЃС‚СЂСѓРєС†РёРµР№
+            document.getElementById('instructionButton').addEventListener('click', () => {
+                document.getElementById('instructionModal').style.display = 'flex';
+            });
+
+            // Р—Р°РєСЂС‹С‚РёРµ РјРѕРґР°Р»СЊРЅРѕРіРѕ РѕРєРЅР°
+            document.getElementById('closeModal').addEventListener('click', () => {
+                document.getElementById('instructionModal').style.display = 'none';
+            });
+
+            // РЎРѕС…СЂР°РЅРµРЅРёРµ РѕС‚СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРЅРѕРіРѕ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
+            document.getElementById('saveEdit').addEventListener('click', () => {
+                currentImage = new Image();
+                currentImage.src = editCanvas.toDataURL();
+                document.getElementById('editModal').style.display = 'none';
+                processImage(); // Р’С‹Р·С‹РІР°РµРј processImage СЃСЂР°Р·Сѓ РїРѕСЃР»Рµ СЃРѕС…СЂР°РЅРµРЅРёСЏ
+            });
+
+            // РћС‡РёСЃС‚РєР° Canvas
+            document.getElementById('clearEdit').addEventListener('click', () => {
+                editCtx.clearRect(0, 0, editCanvas.width, editCanvas.height);
+                editCtx.drawImage(currentImage, 0, 0);
+            });
+
+            // Р РёСЃРѕРІР°РЅРёРµ РЅР° Canvas
+            editCanvas.addEventListener('mousedown', (e) => {
+                isDrawing = true;
+                editCtx.beginPath();
+                editCtx.moveTo(e.offsetX, e.offsetY);
+            });
+
+            editCanvas.addEventListener('mousemove', (e) => {
+                if (isDrawing) {
+                    editCtx.lineTo(e.offsetX, e.offsetY);
+                    editCtx.strokeStyle = 'black';
+                    editCtx.lineWidth = 10;
+                    editCtx.stroke();
+                }
+            });
+
+            editCanvas.addEventListener('mouseup', () => {
+                isDrawing = false;
+            });
+
+            editCanvas.addEventListener('mouseleave', () => {
+                isDrawing = false;
+            });
+        }
+    </script>
 </body>
 </html>
