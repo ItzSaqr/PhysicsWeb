@@ -1,5 +1,6 @@
 let canvas, ctx, maskCanvas, maskCtx, editCanvas, editCtx;
 let currentImage = null;
+let originalImage = null;
 let rectX = 0, rectY = 0;
 let isDrawing = false;
 
@@ -111,6 +112,8 @@ function setupEventListeners() {
         const img = new Image();
         img.onload = () => {
             currentImage = img;
+            originalImage = new Image(); // Сохраняем копию исходного изображения
+            originalImage.src = img.src; // Копируем источник
             editCanvas.width = img.width;
             editCanvas.height = img.height;
             editCtx.drawImage(img, 0, 0);
@@ -154,7 +157,9 @@ function setupEventListeners() {
     // Очистка Canvas
     document.getElementById('clearEdit').addEventListener('click', () => {
         editCtx.clearRect(0, 0, editCanvas.width, editCanvas.height);
-        editCtx.drawImage(currentImage, 0, 0);
+        if (originalImage) {
+            editCtx.drawImage(originalImage, 0, 0); // Восстанавливаем исходное изображение
+        }
     });
 
     // Рисование на Canvas (мышь)
@@ -221,4 +226,18 @@ function setupEventListeners() {
     editCanvas.addEventListener('touchcancel', () => {
         isDrawing = false;
     });
+
+document.getElementById('editButton').addEventListener('click', () => {
+    if (!currentImage) {
+        alert('Сначала выберите изображение!');
+        return;
+    }
+    // Устанавливаем размеры editCanvas под текущее изображение
+    editCanvas.width = currentImage.width;
+    editCanvas.height = currentImage.height;
+    // Отрисовываем текущее изображение на editCanvas
+    editCtx.drawImage(currentImage, 0, 0);
+    // Показываем модальное окно
+    document.getElementById('editModal').style.display = 'flex';
+});
 }
