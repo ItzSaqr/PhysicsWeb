@@ -1,5 +1,5 @@
 body {
-    font-family: 'Arial', sans-serif;
+    font-family: HelveticaMac, system-ui, -apple-system, Segoe UI, Roboto, Arial, Noto Sans, Liberation Sans, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
     background-color: #1e1e1e;
     margin: 0;
     padding: 10px;
@@ -294,7 +294,7 @@ header {
 
 .header-text p {
     margin: 0;
-    font-size: 18px;
+    font-size: 14px;
 }
 
 .panel-right {
@@ -376,6 +376,7 @@ body.light-theme .nav ul li a:hover {
 
 /* Стили для футера */
 footer {
+    
     background-color: #2d2d2d;
     color: #e0e0e0;
     text-align: center;
@@ -383,25 +384,27 @@ footer {
     margin-top: 20px;
     border-top: 1px solid #444;
     border-radius: 10px;
-    position: relative;
+    position: relative; /* Для позиционирования дочерних элементов */
 }
 
 .footer-content {
     display: flex;
-    flex-direction: column;
-    position: relative;
+    flex-direction: row; /* Change to row for horizontal alignment */
+    align-items: flex-start; /* Align items to the top */
+    justify-content: space-between; /* Space between text and nav */
     max-width: 1200px;
     margin: 0 auto;
 }
 
 .footer-text {
-    margin-bottom: 10px;
+    margin-bottom: 0; /* Remove bottom margin */
     text-align: left;
 }
 
 footer p {
+    opacity: 0.7;
     margin: 5px 0;
-    font-size: 14px;
+    font-size: 12px;
 }
 
 footer a {
@@ -417,13 +420,13 @@ footer a:hover {
     list-style: none;
     margin: 0;
     padding: 0;
-    position: absolute;
-    bottom: 20px;
-    right: 10px;
+    /* Remove absolute positioning */
+    position: static;
 }
 
 .nav ul {
     margin: 0;
+    margin-right: 20px;
     padding: 0;
     display: flex;
     list-style: none;
@@ -437,7 +440,7 @@ footer a:hover {
 .nav ul li a {
     color: #fff;
     text-decoration: none;
-    font-size: 30px;
+    font-size: 25px;
     opacity: 0.7;
 }
 
