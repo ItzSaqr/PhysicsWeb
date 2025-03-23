@@ -1,6 +1,8 @@
-let canvas, ctx, maskCanvas, maskCtx, editCanvas, editCtx;
+let canvas, ctx, maskCanvas, maskCtx, editCanvas, editCtx, cropCanvas, cropCtx;
 let currentImage = null;
-let originalImage = null;
+let originalImage = null; // Исходное изображение после загрузки
+let initialCropImage = null; // Состояние до первой обрезки (для возврата размеров)
+let initialEditImage = null; // Состояние после обрезки, но до рисования (для возврата без нарисованного)
 let rectX = 0, rectY = 0;
 let isDrawing = false;
 
@@ -12,6 +14,8 @@ function onOpenCvReady() {
     maskCtx = maskCanvas.getContext('2d');
     editCanvas = document.getElementById('editCanvas');
     editCtx = editCanvas.getContext('2d');
+    cropCanvas = document.getElementById('cropCanvas');
+    cropCtx = cropCanvas.getContext('2d');
     setupEventListeners();
 }
 
@@ -34,7 +38,6 @@ function countEnclosedPixels(imageCanvas, width, height, threshold, invert) {
     let hierarchy = new cv.Mat();
     cv.findContours(binary, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
 
-    // Находим самый большой контур
     let maxArea = 0;
     let maxContourIndex = -1;
     for (let i = 0; i < contours.size(); i++) {
@@ -68,42 +71,68 @@ function processImage() {
     const height = parseInt(document.getElementById('rectHeight').value);
     const threshold = parseInt(document.getElementById('threshold').value);
     const invert = document.getElementById('invert').checked;
-    const cropLeft = parseInt(document.getElementById('cropLeft').value);
-    const cropTop = parseInt(document.getElementById('cropTop').value);
-    const cropRight = parseInt(document.getElementById('cropRight').value);
-    const cropBottom = parseInt(document.getElementById('cropBottom').value);
 
-    // Расчет области обрезки
-    const imgWidth = currentImage.width;
-    const imgHeight = currentImage.height;
+    canvas.width = currentImage.width;
+    canvas.height = currentImage.height;
+    maskCanvas.width = currentImage.width;
+    maskCanvas.height = currentImage.height;
+
+    const maxRectWidth = currentImage.width * 1.5;
+    const maxRectHeight = currentImage.height * 1.5;
+    const rectWidthValue = Math.min(width, maxRectWidth);
+    const rectHeightValue = Math.min(height, maxRectHeight);
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(currentImage, 0, 0);
+    ctx.strokeStyle = 'blue';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(rectX, rectY, rectWidthValue, rectHeightValue);
+
+    const { pixels, mask } = countEnclosedPixels(canvas, rectWidthValue, rectHeightValue, threshold, invert);
+    cv.imshow(maskCanvas, mask);
+    document.getElementById('pixelCount').textContent = `Площадь: ${pixels.toFixed(2)}`;
+    mask.delete();
+}
+
+function applyCropToCanvas(ctx, canvas, image, cropLeft, cropTop, cropRight, cropBottom) {
+    const imgWidth = image.width;
+    const imgHeight = image.height;
     const cropX = (imgWidth * cropLeft) / 100;
     const cropY = (imgHeight * cropTop) / 100;
     const cropWidth = imgWidth - cropX - (imgWidth * cropRight) / 100;
     const cropHeight = imgHeight - cropY - (imgHeight * cropBottom) / 100;
 
-    // Обновление размеров канваса
     canvas.width = cropWidth;
     canvas.height = cropHeight;
-    maskCanvas.width = cropWidth;
-    maskCanvas.height = cropHeight;
 
-    const maxRectWidth = cropWidth * 1.5;
-    const maxRectHeight = cropHeight * 1.5;
-    const rectWidthValue = Math.min(width, maxRectWidth);
-    const rectHeightValue = Math.min(height, maxRectHeight);
-
-    // Отрисовка обрезанного изображения и прямоугольника
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(currentImage, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
-    ctx.strokeStyle = 'blue';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(rectX, rectY, rectWidthValue, rectHeightValue);
+    ctx.drawImage(image, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
+}
 
-    // Подсчет пикселей и создание маски
-    const { pixels, mask } = countEnclosedPixels(canvas, rectWidthValue, rectHeightValue, threshold, invert);
-    cv.imshow(maskCanvas, mask);
-    document.getElementById('pixelCount').textContent = `Площадь: ${pixels.toFixed(2)}`;
-    mask.delete();
+function applyCrop(image, cropLeft, cropTop, cropRight, cropBottom) {
+    const imgWidth = image.width;
+    const imgHeight = image.height;
+    const cropX = (imgWidth * cropLeft) / 100;
+    const cropY = (imgHeight * cropTop) / 100;
+    const cropWidth = imgWidth - cropX - (imgWidth * cropRight) / 100;
+    const cropHeight = imgHeight - cropY - (imgHeight * cropBottom) / 100;
+
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = cropWidth;
+    tempCanvas.height = cropHeight;
+    const tempCtx = tempCanvas.getContext('2d');
+    tempCtx.drawImage(image, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
+
+    const croppedImage = new Image();
+    croppedImage.src = tempCanvas.toDataURL();
+    return croppedImage;
+}
+
+function resetCropSliders() {
+    document.getElementById('cropLeft').value = 0;
+    document.getElementById('cropTop').value = 0;
+    document.getElementById('cropRight').value = 0;
+    document.getElementById('cropBottom').value = 0;
 }
 
 function setupEventListeners() {
@@ -112,12 +141,12 @@ function setupEventListeners() {
         const img = new Image();
         img.onload = () => {
             currentImage = img;
-            originalImage = new Image(); // Сохраняем копию исходного изображения
-            originalImage.src = img.src; // Копируем источник
-            editCanvas.width = img.width;
-            editCanvas.height = img.height;
-            editCtx.drawImage(img, 0, 0);
-            document.getElementById('editModal').style.display = 'flex';
+            originalImage = new Image();
+            originalImage.src = img.src;
+            initialCropImage = new Image(); // Сохраняем исходное изображение при загрузке
+            initialCropImage.src = img.src;
+            initialEditImage = null; // Сбрасываем при загрузке нового изображения
+            processImage();
         };
         img.src = URL.createObjectURL(file);
     });
@@ -136,33 +165,89 @@ function setupEventListeners() {
         input.addEventListener('input', processImage);
     });
 
-    // Открытие модального окна с инструкцией
     document.getElementById('instructionButton').addEventListener('click', () => {
         document.getElementById('instructionModal').style.display = 'flex';
     });
 
-    // Закрытие модального окна
     document.getElementById('closeModal').addEventListener('click', () => {
         document.getElementById('instructionModal').style.display = 'none';
     });
 
-    // Сохранение отредактированного изображения
-    document.getElementById('saveEdit').addEventListener('click', () => {
-        currentImage = new Image();
-        currentImage.src = editCanvas.toDataURL();
-        document.getElementById('editModal').style.display = 'none';
-        processImage(); // Вызываем processImage сразу после сохранения
+    document.getElementById('editButton').addEventListener('click', () => {
+        if (!currentImage) {
+            alert('Сначала выберите изображение!');
+            return;
+        }
+        cropCanvas.width = currentImage.width;
+        cropCanvas.height = currentImage.height;
+        cropCtx.drawImage(currentImage, 0, 0);
+        resetCropSliders(); // Сбрасываем ползунки при открытии
+        document.getElementById('cropModal').style.display = 'flex';
     });
 
-    // Очистка Canvas
-    document.getElementById('clearEdit').addEventListener('click', () => {
-        editCtx.clearRect(0, 0, editCanvas.width, editCanvas.height);
-        if (originalImage) {
-            editCtx.drawImage(originalImage, 0, 0); // Восстанавливаем исходное изображение
+    const cropInputs = ['cropLeft', 'cropTop', 'cropRight', 'cropBottom'];
+    cropInputs.forEach(id => {
+        document.getElementById(id).addEventListener('input', () => {
+            const cropLeft = parseInt(document.getElementById('cropLeft').value);
+            const cropTop = parseInt(document.getElementById('cropTop').value);
+            const cropRight = parseInt(document.getElementById('cropRight').value);
+            const cropBottom = parseInt(document.getElementById('cropBottom').value);
+
+            applyCropToCanvas(cropCtx, cropCanvas, currentImage, cropLeft, cropTop, cropRight, cropBottom);
+        });
+    });
+
+    document.getElementById('saveCrop').addEventListener('click', () => {
+        const cropLeft = parseInt(document.getElementById('cropLeft').value);
+        const cropTop = parseInt(document.getElementById('cropTop').value);
+        const cropRight = parseInt(document.getElementById('cropRight').value);
+        const cropBottom = parseInt(document.getElementById('cropBottom').value);
+
+        currentImage = applyCrop(currentImage, cropLeft, cropTop, cropRight, cropBottom);
+        currentImage.onload = () => {
+            if (!initialEditImage) { // Сохраняем состояние после первой обрезки, но до рисования
+                initialEditImage = new Image();
+                initialEditImage.src = currentImage.src;
+            }
+            document.getElementById('cropModal').style.display = 'none';
+            editCanvas.width = currentImage.width;
+            editCanvas.height = currentImage.height;
+            editCtx.drawImage(currentImage, 0, 0);
+            document.getElementById('editModal').style.display = 'flex';
+        };
+    });
+
+    document.getElementById('clearCrop').addEventListener('click', () => {
+        resetCropSliders(); // Сбрасываем ползунки в ноль
+        cropCtx.clearRect(0, 0, cropCanvas.width, cropCanvas.height);
+        if (initialCropImage) {
+            cropCanvas.width = initialCropImage.width;
+            cropCanvas.height = initialCropImage.height;
+            cropCtx.drawImage(initialCropImage, 0, 0); // Восстанавливаем только исходные размеры
+            currentImage = new Image();
+            currentImage.src = initialCropImage.src; // Возвращаем currentImage к состоянию до обрезки
+            initialEditImage = null; // Сбрасываем, чтобы при следующем сохранении обновилось
         }
     });
 
-    // Рисование на Canvas (мышь)
+    document.getElementById('saveEdit').addEventListener('click', () => {
+        currentImage = new Image();
+        currentImage.src = editCanvas.toDataURL();
+        currentImage.onload = () => {
+            document.getElementById('editModal').style.display = 'none';
+            processImage();
+        };
+    });
+
+    document.getElementById('clearEdit').addEventListener('click', () => {
+        editCtx.clearRect(0, 0, editCanvas.width, editCanvas.height);
+        if (initialEditImage) {
+            editCtx.drawImage(initialEditImage, 0, 0); // Восстанавливаем состояние после обрезки, без нарисованного
+        } else if (currentImage) {
+            editCtx.drawImage(currentImage, 0, 0); // Если нет initialEditImage, используем текущее
+        }
+    });
+
     editCanvas.addEventListener('mousedown', (e) => {
         isDrawing = true;
         editCtx.beginPath();
@@ -186,13 +271,12 @@ function setupEventListeners() {
         isDrawing = false;
     });
 
-    // Рисование на Canvas (сенсорные устройства)
     editCanvas.addEventListener('touchstart', (e) => {
-        if (e.touches.length === 1) { // Рисуем только при одном касании
+        if (e.touches.length === 1) {
             const touch = e.touches[0];
             const rect = editCanvas.getBoundingClientRect();
-            const scaleX = editCanvas.width / rect.width; // Масштабирование по X
-            const scaleY = editCanvas.height / rect.height; // Масштабирование по Y
+            const scaleX = editCanvas.width / rect.width;
+            const scaleY = editCanvas.height / rect.height;
             const offsetX = (touch.clientX - rect.left) * scaleX;
             const offsetY = (touch.clientY - rect.top) * scaleY;
             isDrawing = true;
@@ -202,11 +286,11 @@ function setupEventListeners() {
     });
 
     editCanvas.addEventListener('touchmove', (e) => {
-        if (isDrawing && e.touches.length === 1) { // Рисуем только при одном касании
+        if (isDrawing && e.touches.length === 1) {
             const touch = e.touches[0];
             const rect = editCanvas.getBoundingClientRect();
-            const scaleX = editCanvas.width / rect.width; // Масштабирование по X
-            const scaleY = editCanvas.height / rect.height; // Масштабирование по Y
+            const scaleX = editCanvas.width / rect.width;
+            const scaleY = editCanvas.height / rect.height;
             const offsetX = (touch.clientX - rect.left) * scaleX;
             const offsetY = (touch.clientY - rect.top) * scaleY;
             editCtx.lineTo(offsetX, offsetY);
@@ -214,7 +298,6 @@ function setupEventListeners() {
             editCtx.lineWidth = 10;
             editCtx.stroke();
         } else {
-            // Если не рисуем, разрешаем прокрутку страницы
             e.preventDefault();
         }
     });
@@ -226,18 +309,4 @@ function setupEventListeners() {
     editCanvas.addEventListener('touchcancel', () => {
         isDrawing = false;
     });
-
-document.getElementById('editButton').addEventListener('click', () => {
-    if (!currentImage) {
-        alert('Сначала выберите изображение!');
-        return;
-    }
-    // Устанавливаем размеры editCanvas под текущее изображение
-    editCanvas.width = currentImage.width;
-    editCanvas.height = currentImage.height;
-    // Отрисовываем текущее изображение на editCanvas
-    editCtx.drawImage(currentImage, 0, 0);
-    // Показываем модальное окно
-    document.getElementById('editModal').style.display = 'flex';
-});
 }

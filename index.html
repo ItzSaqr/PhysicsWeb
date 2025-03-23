@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="opencv.js" onload="onOpenCvReady();" async></script>
     <script src="script.js"></script>
 </head>
@@ -22,40 +23,12 @@
 
     <div class="container" style="margin-top: 1%">
         <div class="image-container">
-            <label for="imageInput" class="custom-file-input">
-                Выберите файл
-            </label>
+            <label for="imageInput" class="custom-file-input">Выберите файл</label>
             <input type="file" id="imageInput" class="hidden-file-input" accept="image/*">
             <button class="instruction-button" id="editButton">Редактировать изображение</button>
-            <!-- Модальное окно для редактирования изображения -->
-            <div id="editModal" class="modal">
-                <div class="modal-content">
-                    <h2>Редактирование изображения</h2>
-                    <p>Закрасьте лишние элементы изображения черным цветом.</p>
-                    <div class="canvas-container">
-                        <canvas id="editCanvas"></canvas>
-                    </div>
-                    <div class="modal-buttons">
-                        <button id="clearEdit">Очистить</button>
-                        <button id="saveEdit">Сохранить и продолжить</button>
-                    </div>
-                </div>
-            </div>
 
             <div class="image-section">
                 <h3>Обрезка и настройка квадрата</h3>
-                <div class="controls">
-                    <label>Обрезка слева: <input type="range" id="cropLeft" value="0" min="0" max="100"></label>
-                </div>
-                <div class="controls">
-                    <label>Обрезка сверху: <input type="range" id="cropTop" value="0" min="0" max="100"></label>
-                </div>
-                <div class="controls">
-                    <label>Обрезка справа: <input type="range" id="cropRight" value="0" min="0" max="100"></label>
-                </div>
-                <div class="controls">
-                    <label>Обрезка снизу: <input type="range" id="cropBottom" value="0" min="0" max="100"></label>
-                </div>
                 <div class="controls">
                     <label>Ширина квадрата: <input type="range" id="rectWidth" value="30" min="0" max="250"></label>
                 </div>
@@ -87,17 +60,59 @@
         </div>
     </div>
 
+    <!-- Модальное окно для обрезки -->
+    <div id="cropModal" class="modal">
+        <div class="modal-content">
+            <h2>Обрезка изображения</h2>
+            <p>Настройте обрезку изображения с помощью ползунков.</p>
+            <div class="canvas-container">
+                <canvas id="cropCanvas"></canvas>
+            </div>
+            <div class="controls">
+                <label>Обрезка слева (%): <input type="range" id="cropLeft" value="0" min="0" max="100"></label>
+            </div>
+            <div class="controls">
+                <label>Обрезка сверху (%): <input type="range" id="cropTop" value="0" min="0" max="100"></label>
+            </div>
+            <div class="controls">
+                <label>Обрезка справа (%): <input type="range" id="cropRight" value="0" min="0" max="100"></label>
+            </div>
+            <div class="controls">
+                <label>Обрезка снизу (%): <input type="range" id="cropBottom" value="0" min="0" max="100"></label>
+            </div>
+            <div class="modal-buttons">
+                <button id="clearCrop">Очистить</button>
+                <button id="saveCrop">Сохранить и продолжить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для рисования -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <h2>Редактирование изображения</h2>
+            <p>Закрасьте лишние элементы изображения черным цветом.</p>
+            <div class="canvas-container">
+                <canvas id="editCanvas"></canvas>
+            </div>
+            <div class="modal-buttons">
+                <button id="clearEdit">Очистить</button>
+                <button id="saveEdit">Сохранить и продолжить</button>
+            </div>
+        </div>
+    </div>
+
     <div id="instructionModal" class="modal">
         <div class="modal-content">
             <h2>Инструкция по использованию</h2>
             <p>
                 1. Сделайте фото петли на экране осциллографа (чем ровнее будет сделано фото, тем точнее будет результат вычислений).<br>
-                2. Загрузите изображение, нажав на кнопку "Выбрать файл" в верхней части страницы.<br>
-                3. При необходимости закрасьте черным цветом ненужные участки изображения.<br>
-                4. Используйте ползунки для настройки обрезки границ изображения.<br>
-                5. Настройте размер прямоугольника под размеры квадрата на фото, используя ползунки. Также настройте положение прямоугольника, двигая его левый верхний угол при помощи соответствующих ползунков.<br>
-                6. Настройте границу цвета и инвертируйте изображение, если необходимо.<br>
-                7. Величина площади (в клетках) будет отображаться под изображением внизу страницы (учитывается только самая большая зона).<br>
+                2. Загрузите изображение, нажав на кнопку "Выбрать файл".<br>
+                3. Нажмите "Редактировать изображение".<br>
+                4. В первом окне настройте обрезку границ изображения.<br>
+                5. Во втором окне закрасьте черным цветом ненужные участки изображения.<br>
+                6. Настройте размер прямоугольника и параметры маски на главной странице.<br>
+                7. Величина площади будет отображаться под изображением.<br>
             </p>
             <button class="instruction-button" id="closeModal">Закрыть</button>
         </div>
@@ -106,7 +121,11 @@
     <footer>
         <div>
             <p>Разработано командой: Рябов Ярослав, Кострикин Андрей, Рябко Владислав</p>
-            <p><a href="https://github.com/ItzSaqr/PhysicsWeb" target="_blank">GitHub репозиторий</a></p>
+            <nav class="nav">
+                 <ul>
+                     <li><a href="https://github.com/ItzSaqr/PhysicsWeb" target="_blank"><i class="fab fa-github"></i></a></li>
+                 </ul>
+             </nav>
             <p>Поддержка: physicsweb2025@gmail.com</p>
             <p>© 2025 Все права защищены. :)</p>
         </div>
