@@ -401,7 +401,7 @@ footer a:hover {
 }
 
 .nav {
-    list-style: none;
+    list-style: none; /* Убираем маркеры списка */
     margin: 0;
     padding: 0;
     position: absolute; /* Абсолютное позиционирование для смещения в правый нижний угол */
@@ -413,10 +413,12 @@ footer a:hover {
     margin: 0;
     padding: 0;
     display: flex;
+    list-style: none; /* Убираем маркеры списка для ul */
 }
 
 .nav ul li {
     align-content: center;
+    list-style: none; /* Убираем маркеры списка для li */
 }
 
 .nav ul li a {
