@@ -16,10 +16,10 @@
         <div class="logo-container">
             <img src="logo.svg" alt="Логотип" class="logo">
         </div>
-        <div class="header-text">
+        <!--<div class="header-text">
             <p>Сайт представляет собой инструмент для расчета площади контура на изображении.</p>
             <p>Этот сайт может быть полезен студентам при выполнении лабораторных работ по физике.</p>
-        </div>
+        </div>-->
         <div class="panel-right">
             <button class="theme-toggle" id="themeToggle" title="Сменить тему">
                 <i class="fas fa-sun"></i>
@@ -35,7 +35,7 @@
             <button class="instruction-button" id="editButton">Редактировать изображение</button>
 
             <div class="image-section">
-                <h3>Обрезка и настройка квадрата</h3>
+                <h3>Настройка квадрата</h3>
                 <div class="controls">
                     <label>Ширина квадрата: <input type="range" id="rectWidth" value="30" min="0" max="250"></label>
                 </div>
@@ -55,7 +55,7 @@
             <div class="image-section">
                 <h3>Настройки маски</h3>
                 <div class="controls">
-                    <label>Порог: <input type="range" id="threshold" value="127" min="0" max="255"></label>
+                    <label>Граница цвета: <input type="range" id="threshold" value="127" min="0" max="255"></label>
                 </div>
                 <div class="controls">
                     <label><input type="checkbox" id="invert" checked> Инвертировать</label>
@@ -134,7 +134,7 @@
             </div>
             <nav class="nav">
                 <ul>
-                    <li><a href="https://github.com/ItzSaqr/PhysicsWeb" target="_blank"><i class="fab fa-github"></i></a></li>
+                    <li><a href="https://github.com/ItzSaqr/PhysicsWeb" target="_blank" title="GitHub"><i class="fab fa-github"></i></a></li>
                 </ul>
             </nav>
         </div>
