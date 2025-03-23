@@ -11,12 +11,19 @@
     <script src="script.js"></script>
 </head>
 <body>
+    <!-- Объединённый header -->
     <header>
-        <div class="header-text">
-            <p> Сайт представляет собой инструмент для расчета площади контура на изображении.</p>
-            <p> Этот сайт может быть полезен студентам при выполнении лабораторных работ по физике. </p>
+        <div class="logo-container">
+            <img src="logo.svg" alt="Логотип" class="logo">
         </div>
-        <div class="header-button">
+        <div class="header-text">
+            <p>Сайт представляет собой инструмент для расчета площади контура на изображении.</p>
+            <p>Этот сайт может быть полезен студентам при выполнении лабораторных работ по физике.</p>
+        </div>
+        <div class="panel-right">
+            <button class="theme-toggle" id="themeToggle" title="Сменить тему">
+                <i class="fas fa-sun"></i>
+            </button>
             <button class="instruction-button" id="instructionButton">Инструкция</button>
         </div>
     </header>
@@ -60,7 +67,7 @@
         </div>
     </div>
 
-    <!-- Модальное окно для обрезки -->
+    <!-- Модальные окна остаются без изменений -->
     <div id="cropModal" class="modal">
         <div class="modal-content">
             <h2>Обрезка изображения</h2>
@@ -87,7 +94,6 @@
         </div>
     </div>
 
-    <!-- Модальное окно для рисования -->
     <div id="editModal" class="modal">
         <div class="modal-content">
             <h2>Редактирование изображения</h2>
@@ -133,5 +139,6 @@
             </nav>
         </div>
     </footer>
+
 </body>
 </html>

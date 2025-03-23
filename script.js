@@ -310,4 +310,21 @@ function setupEventListeners() {
         isDrawing = false;
     });
 
+            document.getElementById('themeToggle').addEventListener('click', function() {
+            document.body.classList.toggle('light-theme');
+            const icon = this.querySelector('i');
+            if (document.body.classList.contains('light-theme')) {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+            } else {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+            }
+        });
+
+        document.getElementById('languageSelect').addEventListener('change', function() {
+            const lang = this.value;
+            console.log('Язык изменен на: ' + lang);
+            // Здесь можно добавить логику перевода
+        });
 }
