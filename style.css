@@ -292,28 +292,6 @@ background-color: #0056b3;
     }
 }
 
-/* Стили для футера */
-footer {
-    background-color: #2d2d2d;
-    color: #e0e0e0;
-    text-align: center;
-    padding: 10px;
-    margin-top: 20px;
-    border-top: 1px solid #444;
-    border-radius: 10px;
-}
-footer p {
-    margin: 5px 0;
-    font-size: 14px;
-}
-footer a {
-    color: #007bff;
-    text-decoration: none;
-}
-footer a:hover {
-    text-decoration: underline;
-}
-
 header {
     background-color: #2d2d2d;
     color: #e0e0e0;
@@ -382,27 +360,72 @@ header nav a:hover {
 header nav a:active {
     background: linear-gradient(145deg, #005bb5, #004080);
 }
+
+/* Стили для футера */
+footer {
+    background-color: #2d2d2d;
+    color: #e0e0e0;
+    text-align: center;
+    padding: 10px;
+    margin-top: 20px;
+    border-top: 1px solid #444;
+    border-radius: 10px;
+    position: relative; /* Для позиционирования дочерних элементов */
+}
+
+.footer-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.footer-text {
+    margin-bottom: 10px; /* Отступ снизу для текста */
+}
+
+footer p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+footer a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
 .nav {
-     list-style: none;
-     margin: 0;
-     padding: 0;
-     display: flex;
-     justify-content: center;
- }
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: absolute; /* Абсолютное позиционирование для смещения в правый нижний угол */
+    bottom: 10px; /* Отступ от нижнего края футера */
+    right: 10px; /* Отступ от правого края футера */
+}
 
- .nav ul li {
-     align-content: center;
-     margin-right: 20px;
- }
+.nav ul {
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
 
- .nav ul li a {
-     color: #fff;
-     text-decoration: none;
-     font-size: 30px;
-     opacity: 0.7;
+.nav ul li {
+    align-content: center;
+}
 
- }
+.nav ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 30px;
+    opacity: 0.7;
+}
 
- .nav ul li a:hover {
-     opacity: 0.9;
- }
+.nav ul li a:hover {
+    opacity: 0.9;
+}
