@@ -1,107 +1,3 @@
-/* Новая панель вверху */
-.top-panel {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #2d2d2d;
-    padding: 10px 15px;
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-    max-width: 1200px;
-    margin: 0 auto 15px auto;
-}
-
-.logo-container {
-    display: flex;
-    align-items: center;
-}
-
-.logo {
-    width: 40px; /* Размер логотипа */
-    height: 40px;
-    object-fit: contain;
-}
-
-.panel-right {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.theme-toggle {
-    background: none;
-    border: none;
-    color: #e0e0e0;
-    font-size: 20px;
-    cursor: pointer;
-    padding: 5px;
-    transition: color 0.3s ease;
-}
-
-.theme-toggle:hover {
-    color: #007bff;
-}
-
-.language-select {
-    background-color: #444;
-    color: #e0e0e0;
-    border: 1px solid #444;
-    border-radius: 5px;
-    padding: 5px;
-    font-size: 14px;
-    cursor: pointer;
-}
-
-/* Светлая тема */
-body.light-theme {
-    background-color: #f0f0f0;
-    color: #333;
-}
-
-body.light-theme .container,
-body.light-theme header,
-body.light-theme .modal-content,
-body.light-theme footer,
-body.light-theme .top-panel {
-    background-color: #fff;
-    color: #333;
-}
-
-body.light-theme canvas,
-body.light-theme .modal-content .canvas-container {
-    background-color: #fff;
-    border-color: #ccc;
-}
-
-body.light-theme #pixelCount {
-    background-color: #f0f0f0;
-    color: #007bff;
-    border-color: #ccc;
-}
-
-body.light-theme .controls label {
-    color: #333;
-}
-
-body.light-theme .custom-file-input {
-    background-color: #007bff;
-}
-
-body.light-theme .custom-file-input:hover {
-    background-color: #0056b3;
-}
-
-/* Исправление цвета иконки GitHub в светлой теме */
-body.light-theme .nav ul li a {
-    color: #333; /* Тёмный цвет для иконки в светлой теме */
-    opacity: 0.7;
-}
-
-body.light-theme .nav ul li a:hover {
-    opacity: 1;
-}
-
-/* Остальные стили остаются без изменений */
 body {
     font-family: 'Arial', sans-serif;
     background-color: #1e1e1e;
@@ -363,21 +259,37 @@ canvas {
     background: linear-gradient(145deg, #1e7e34, #19692c);
 }
 
+/* Обновлённый header */
 header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     background-color: #2d2d2d;
-    color: #e0e0e0;
-    padding: 15px;
-    margin-bottom: 15px;
+    padding: 10px 15px;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     max-width: 1200px;
     margin: 0 auto 15px auto;
+    color: #e0e0e0;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
 }
 
 .header-text {
     display: flex;
     flex-direction: column;
     gap: 5px;
+    flex-grow: 1; /* Позволяет тексту занимать доступное пространство */
+    margin-left: 15px; /* Отступ слева от логотипа */
 }
 
 .header-text p {
@@ -385,6 +297,84 @@ header {
     font-size: 18px;
 }
 
+.panel-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.theme-toggle {
+    background: none;
+    border: none;
+    color: #e0e0e0;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 5px;
+    transition: color 0.3s ease;
+}
+
+.theme-toggle:hover {
+    color: #007bff;
+}
+
+.language-select {
+    background-color: #444;
+    color: #e0e0e0;
+    border: 1px solid #444;
+    border-radius: 5px;
+    padding: 5px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* Светлая тема */
+body.light-theme {
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+body.light-theme .container,
+body.light-theme header,
+body.light-theme .modal-content,
+body.light-theme footer {
+    background-color: #fff;
+    color: #333;
+}
+
+body.light-theme canvas,
+body.light-theme .modal-content .canvas-container {
+    background-color: #fff;
+    border-color: #ccc;
+}
+
+body.light-theme #pixelCount {
+    background-color: #f0f0f0;
+    color: #007bff;
+    border-color: #ccc;
+}
+
+body.light-theme .controls label {
+    color: #333;
+}
+
+body.light-theme .custom-file-input {
+    background-color: #007bff;
+}
+
+body.light-theme .custom-file-input:hover {
+    background-color: #0056b3;
+}
+
+body.light-theme .nav ul li a {
+    color: #333;
+    opacity: 0.7;
+}
+
+body.light-theme .nav ul li a:hover {
+    opacity: 1;
+}
+
+/* Стили для футера */
 footer {
     background-color: #2d2d2d;
     color: #e0e0e0;
@@ -445,7 +435,7 @@ footer a:hover {
 }
 
 .nav ul li a {
-    color: #fff; /* Цвет иконки в тёмной теме */
+    color: #fff;
     text-decoration: none;
     font-size: 30px;
     opacity: 0.7;
@@ -457,14 +447,22 @@ footer a:hover {
 
 /* Адаптация для мобильных устройств */
 @media (max-width: 600px) {
-    .top-panel {
+    header {
         flex-direction: column;
-        gap: 10px;
+        padding: 10px;
+        align-items: center;
+    }
+
+    .header-text {
+        text-align: center;
+        margin-left: 0; /* Убираем отступ на мобильных */
+        margin-top: 10px; /* Отступ сверху */
     }
 
     .panel-right {
         flex-direction: column;
         gap: 5px;
+        margin-top: 10px;
     }
 
     .container {
@@ -501,13 +499,5 @@ footer a:hover {
     .instruction-button {
         padding: 6px 12px;
         font-size: 12px;
-    }
-
-    header {
-        padding: 10px;
-    }
-
-    .header-text {
-        text-align: center;
     }
 }
