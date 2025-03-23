@@ -376,7 +376,6 @@ footer {
 .footer-content {
     display: flex;
     flex-direction: column;
-    align-items: center;
     position: relative;
     max-width: 1200px;
     margin: 0 auto;
@@ -384,6 +383,7 @@ footer {
 
 .footer-text {
     margin-bottom: 10px; /* Отступ снизу для текста */
+    text-align: left;
 }
 
 footer p {
