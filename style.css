@@ -241,7 +241,8 @@ canvas {
 }
 
 .instruction-button {
-    padding: 8px 16px;
+    margin: 5px;
+    padding: 10px;
     border: none;
     border-radius: 5px;
     background: linear-gradient(145deg, #28a745, #218838);
@@ -279,9 +280,11 @@ header {
 }
 
 .logo {
+    
+    margin: 5px;
     border-radius: 2px;
-    width: 40px;
-    height: 40px;
+    width: 60px;
+    height: 60px;
     object-fit: contain;
 }
 
@@ -452,21 +455,9 @@ footer a:hover {
 /* Адаптация для мобильных устройств */
 @media (max-width: 600px) {
     header {
-        flex-direction: column;
+        
         padding: 10px;
         align-items: center;
-    }
-
-    .header-text {
-        text-align: center;
-        margin-left: 0; /* Убираем отступ на мобильных */
-        margin-top: 10px; /* Отступ сверху */
-    }
-
-    .panel-right {
-        flex-direction: column;
-        gap: 5px;
-        margin-top: 10px;
     }
 
     .container {
@@ -501,6 +492,7 @@ footer a:hover {
     }
 
     .instruction-button {
+        padding: 20px;
         padding: 6px 12px;
         font-size: 12px;
     }
