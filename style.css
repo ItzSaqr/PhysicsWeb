@@ -1,3 +1,107 @@
+/* Новая панель вверху */
+.top-panel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #2d2d2d;
+    padding: 10px 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    max-width: 1200px;
+    margin: 0 auto 15px auto;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    width: 40px; /* Размер логотипа */
+    height: 40px;
+    object-fit: contain;
+}
+
+.panel-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.theme-toggle {
+    background: none;
+    border: none;
+    color: #e0e0e0;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 5px;
+    transition: color 0.3s ease;
+}
+
+.theme-toggle:hover {
+    color: #007bff;
+}
+
+.language-select {
+    background-color: #444;
+    color: #e0e0e0;
+    border: 1px solid #444;
+    border-radius: 5px;
+    padding: 5px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* Светлая тема */
+body.light-theme {
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+body.light-theme .container,
+body.light-theme header,
+body.light-theme .modal-content,
+body.light-theme footer,
+body.light-theme .top-panel {
+    background-color: #fff;
+    color: #333;
+}
+
+body.light-theme canvas,
+body.light-theme .modal-content .canvas-container {
+    background-color: #fff;
+    border-color: #ccc;
+}
+
+body.light-theme #pixelCount {
+    background-color: #f0f0f0;
+    color: #007bff;
+    border-color: #ccc;
+}
+
+body.light-theme .controls label {
+    color: #333;
+}
+
+body.light-theme .custom-file-input {
+    background-color: #007bff;
+}
+
+body.light-theme .custom-file-input:hover {
+    background-color: #0056b3;
+}
+
+/* Исправление цвета иконки GitHub в светлой теме */
+body.light-theme .nav ul li a {
+    color: #333; /* Тёмный цвет для иконки в светлой теме */
+    opacity: 0.7;
+}
+
+body.light-theme .nav ul li a:hover {
+    opacity: 1;
+}
+
+/* Остальные стили остаются без изменений */
 body {
     font-family: 'Arial', sans-serif;
     background-color: #1e1e1e;
@@ -5,6 +109,7 @@ body {
     padding: 10px;
     color: #e0e0e0;
 }
+
 .container {
     display: flex;
     flex-direction: column;
@@ -16,6 +121,7 @@ body {
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
+
 canvas {
     border: 1px solid #444;
     border-radius: 5px;
@@ -24,25 +130,29 @@ canvas {
     max-width: 100%;
     height: auto;
 }
+
 .custom-file-input {
-display: inline-block;
-padding: 10px 20px;
-background-color: #007bff;
-color: white;
-border-radius: 5px;
-cursor: pointer;
-text-align: center;
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
 }
 
 .custom-file-input:hover {
-background-color: #0056b3;
+    background-color: #0056b3;
 }
+
 .hidden-file-input {
     display: none;
 }
+
 .controls {
     margin: 10px 0;
 }
+
 .controls label {
     display: block;
     margin-bottom: 5px;
@@ -50,12 +160,15 @@ background-color: #0056b3;
     color: #e0e0e0;
     font-size: 14px;
 }
+
 .controls input[type="range"] {
     width: 100%;
 }
+
 .controls input[type="checkbox"] {
     margin-right: 10px;
 }
+
 .controls input[type="file"] {
     width: 100%;
     padding: 8px;
@@ -68,12 +181,15 @@ background-color: #0056b3;
     text-align: center;
     font-size: 14px;
 }
+
 .controls input[type="file"]:hover {
     background: linear-gradient(145deg, #005bb5, #004080);
 }
+
 .controls input[type="file"]::file-selector-button {
     display: none;
 }
+
 .controls input[type="range"] {
     -webkit-appearance: none;
     appearance: none;
@@ -82,6 +198,7 @@ background-color: #0056b3;
     border-radius: 5px;
     outline: none;
 }
+
 .controls input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
@@ -92,9 +209,11 @@ background-color: #0056b3;
     cursor: pointer;
     transition: background 0.3s ease;
 }
+
 .controls input[type="range"]::-webkit-slider-thumb:hover {
     background: #005bb5;
 }
+
 .controls input[type="range"]::-moz-range-thumb {
     width: 18px;
     height: 18px;
@@ -103,9 +222,11 @@ background-color: #0056b3;
     cursor: pointer;
     transition: background 0.3s ease;
 }
+
 .controls input[type="range"]::-moz-range-thumb:hover {
     background: #005bb5;
 }
+
 #pixelCount {
     margin-top: 15px;
     font-size: 20px;
@@ -118,22 +239,19 @@ background-color: #0056b3;
     border: 1px solid #444;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
+
 .image-container {
     display: flex;
     flex-direction: column;
     gap: 15px;
 }
+
 .image-section {
     display: flex;
     flex-direction: column;
     gap: 8px;
 }
-.credits {
-    margin-top: 10px;
-    font-size: 12px;
-    color: #888;
-    text-align: center;
-}
+
 .modal {
     display: none;
     position: fixed;
@@ -145,6 +263,7 @@ background-color: #0056b3;
     justify-content: center;
     align-items: center;
 }
+
 .modal-content {
     background-color: #2d2d2d;
     padding: 15px;
@@ -157,25 +276,30 @@ background-color: #0056b3;
     flex-direction: column;
     max-height: 90vh;
 }
+
 .modal-content h2 {
     margin-top: 0;
     font-size: 18px;
 }
+
 .modal-content .canvas-container {
-    overflow: auto; /* Прокрутка для Canvas */
+    overflow: auto;
     max-height: 70vh;
     border: 1px solid #444;
     border-radius: 5px;
     background: #1e1e1e;
 }
+
 .modal-content canvas {
-    display: block; /* Убираем лишние отступы */
+    display: block;
 }
+
 .modal-buttons {
     display: flex;
     justify-content: space-between;
     margin-top: 10px;
 }
+
 .modal-buttons button {
     padding: 8px 16px;
     border: none;
@@ -183,34 +307,43 @@ background-color: #0056b3;
     cursor: pointer;
     transition: background 0.3s ease;
 }
+
 .modal-buttons button#clearEdit {
     background: linear-gradient(145deg, #dc3545, #c82333);
     color: #fff;
 }
+
 .modal-buttons button#clearEdit:hover {
     background: linear-gradient(145deg, #c82333, #bd2130);
 }
+
 .modal-buttons button#saveEdit {
     background: linear-gradient(145deg, #28a745, #218838);
     color: #fff;
 }
+
 .modal-buttons button#saveEdit:hover {
     background: linear-gradient(145deg, #218838, #1e7e34);
 }
+
 .modal-buttons button#clearCrop {
     background: linear-gradient(145deg, #dc3545, #c82333);
     color: #fff;
 }
+
 .modal-buttons button#clearCrop:hover {
     background: linear-gradient(145deg, #c82333, #bd2130);
 }
+
 .modal-buttons button#saveCrop {
     background: linear-gradient(145deg, #28a745, #218838);
     color: #fff;
 }
+
 .modal-buttons button#saveCrop:hover {
     background: linear-gradient(145deg, #218838, #1e7e34);
 }
+
 .instruction-button {
     padding: 8px 16px;
     border: none;
@@ -221,75 +354,13 @@ background-color: #0056b3;
     cursor: pointer;
     transition: background 0.3s ease;
 }
+
 .instruction-button:hover {
     background: linear-gradient(145deg, #218838, #1e7e34);
 }
+
 .instruction-button:active {
     background: linear-gradient(145deg, #1e7e34, #19692c);
-}
-
-/* Адаптация для мобильных устройств */
-@media (max-width: 600px) {
-    .container {
-        padding: 10px;
-    }
-    .controls label {
-        font-size: 12px;
-    }
-    .controls input[type="file"] {
-        padding: 6px;
-        font-size: 12px;
-    }
-    #pixelCount {
-        font-size: 16px;
-        padding: 6px;
-    }
-    .modal-content {
-        padding: 10px;
-    }
-    .modal-content h2 {
-        font-size: 16px;
-    }
-    .modal-content button {
-        padding: 6px 12px;
-        font-size: 12px;
-    }
-    .instruction-button {
-        padding: 6px 12px;
-        font-size: 12px;
-    }
-    header {
-        flex-direction: column;
-        padding: 10px;
-        align-items: center;
-    }
-
-    .header-text {
-        text-align: center;
-    }
-
-    .header-button {
-        margin-top: 10px;
-        align-items: center; /* Центрируем кнопку и изображение на мобильных */
-    }
-
-    header h1 {
-        font-size: 20px;
-        text-align: center;
-    }
-
-    header nav {
-        flex-direction: column;
-        gap: 10px;
-        margin-top: 10px;
-        width: 100%;
-    }
-
-    header nav a {
-        text-align: center;
-        padding: 6px 12px;
-        font-size: 12px;
-    }
 }
 
 header {
@@ -299,69 +370,21 @@ header {
     margin-bottom: 15px;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-    display: flex; /* Оставляем flex для горизонтального размещения текста и кнопки */
-    justify-content: space-between; /* Текст слева, кнопка справа */
-    align-items: flex-start; /* Выравниваем по верху */
     max-width: 1200px;
     margin: 0 auto 15px auto;
 }
 
 .header-text {
     display: flex;
-    flex-direction: column; /* Текст идёт вертикально */
-    gap: 5px; /* Расстояние между абзацами */
+    flex-direction: column;
+    gap: 5px;
 }
 
 .header-text p {
-    margin: 0; /* Убираем стандартные отступы параграфов */
-    font-size: 18px; /* Устанавливаем размер текста (можно настроить) */
-}
-
-.header-button {
-    display: flex;
-    flex-direction: column; /* Элементы (кнопка и изображение) идут друг под другом */
-    align-items: flex-end; /* Выравниваем элементы по правому краю */
-    gap: 5px; /* Расстояние между кнопкой и изображением */
-}
-
-.header-image {
-    width: 10%; /* Ширина изображения равна ширине кнопки */
-    max-width: 100%; /* Ограничиваем ширину контейнером */
-    height: auto; /* Сохраняем пропорции изображения */
-    aspect-ratio: 1 / 1; /* Делаем изображение квадратным */
-    object-fit: cover; /* Обрезаем изображение, если оно не квадратное */
-}
-
-header h1 {
     margin: 0;
-    font-size: 24px;
-    font-weight: bold;
+    font-size: 18px;
 }
 
-header nav {
-    display: flex;
-    gap: 15px;
-}
-
-header nav a {
-    color: #007bff;
-    text-decoration: none;
-    font-size: 14px;
-    padding: 8px 16px;
-    border-radius: 5px;
-    transition: background 0.3s ease, color 0.3s ease;
-}
-
-header nav a:hover {
-    background: linear-gradient(145deg, #007bff, #005bb5);
-    color: #fff;
-}
-
-header nav a:active {
-    background: linear-gradient(145deg, #005bb5, #004080);
-}
-
-/* Стили для футера */
 footer {
     background-color: #2d2d2d;
     color: #e0e0e0;
@@ -370,7 +393,7 @@ footer {
     margin-top: 20px;
     border-top: 1px solid #444;
     border-radius: 10px;
-    position: relative; /* Для позиционирования дочерних элементов */
+    position: relative;
 }
 
 .footer-content {
@@ -382,7 +405,7 @@ footer {
 }
 
 .footer-text {
-    margin-bottom: 10px; /* Отступ снизу для текста */
+    margin-bottom: 10px;
     text-align: left;
 }
 
@@ -401,28 +424,28 @@ footer a:hover {
 }
 
 .nav {
-    list-style: none; /* Убираем маркеры списка */
+    list-style: none;
     margin: 0;
     padding: 0;
-    position: absolute; /* Абсолютное позиционирование для смещения в правый нижний угол */
-    bottom: 10px; /* Отступ от нижнего края футера */
-    right: 10px; /* Отступ от правого края футера */
+    position: absolute;
+    bottom: 20px;
+    right: 10px;
 }
 
 .nav ul {
     margin: 0;
     padding: 0;
     display: flex;
-    list-style: none; /* Убираем маркеры списка для ul */
+    list-style: none;
 }
 
 .nav ul li {
     align-content: center;
-    list-style: none; /* Убираем маркеры списка для li */
+    list-style: none;
 }
 
 .nav ul li a {
-    color: #fff;
+    color: #fff; /* Цвет иконки в тёмной теме */
     text-decoration: none;
     font-size: 30px;
     opacity: 0.7;
@@ -430,4 +453,61 @@ footer a:hover {
 
 .nav ul li a:hover {
     opacity: 0.9;
+}
+
+/* Адаптация для мобильных устройств */
+@media (max-width: 600px) {
+    .top-panel {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .panel-right {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .container {
+        padding: 10px;
+    }
+
+    .controls label {
+        font-size: 12px;
+    }
+
+    .controls input[type="file"] {
+        padding: 6px;
+        font-size: 12px;
+    }
+
+    #pixelCount {
+        font-size: 16px;
+        padding: 6px;
+    }
+
+    .modal-content {
+        padding: 10px;
+    }
+
+    .modal-content h2 {
+        font-size: 16px;
+    }
+
+    .modal-content button {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    .instruction-button {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    header {
+        padding: 10px;
+    }
+
+    .header-text {
+        text-align: center;
+    }
 }
