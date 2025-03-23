@@ -279,6 +279,7 @@ header {
 }
 
 .logo {
+    border-radius: 2px;
     width: 40px;
     height: 40px;
     object-fit: contain;
